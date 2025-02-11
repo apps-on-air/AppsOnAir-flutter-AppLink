@@ -1,3 +1,4 @@
+import 'package:appsonair_flutter_applink/models/options.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import 'appsonair_flutter_applink_method_channel.dart';
@@ -23,7 +24,15 @@ abstract class AppsonairFlutterApplinkPlatform extends PlatformInterface {
     _instance = instance;
   }
 
-  Future<String?> initializeAppLink() {
+  Future<String?> getReferralDetails() {
+    throw UnimplementedError('platformVersion() has not been implemented.');
+  }
+
+  Future<String?> createAppLink({Options? options}) {
+    throw UnimplementedError('platformVersion() has not been implemented.');
+  }
+
+  Stream<String?> initializeAppLink() {
     throw UnimplementedError('platformVersion() has not been implemented.');
   }
 }
