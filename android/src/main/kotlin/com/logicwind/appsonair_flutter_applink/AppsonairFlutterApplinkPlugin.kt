@@ -123,8 +123,6 @@ class AppsonairFlutterApplinkPlugin: FlutterPlugin, MethodCallHandler, ActivityA
     if (intent != null) {
       deeplinkService.initialize(intent, object : AppLinkListener {
         override fun onDeepLinkProcessed(uri: Uri, params: Map<String, String>) {
-          Log.d("DeepLinkListener", "Deep link processed --> $uri")
-          Log.d("DeepLinkListener", "Parameters: $params")
           val mapData= mapOf(
             "uri" to uri,
             "params" to params,
@@ -138,8 +136,6 @@ class AppsonairFlutterApplinkPlugin: FlutterPlugin, MethodCallHandler, ActivityA
         }
 
         override fun onReferralLinkDetected(uri: Uri, params: Map<String, String>) {
-          Log.d("DeepLinkListener", "Referral link detected --> $uri")
-          Log.d("DeepLinkListener", "Parameters: $params")
           val mapData= mapOf(
             "uri" to uri,
             "params" to params,

@@ -1,3 +1,6 @@
+import 'dart:developer';
+import 'dart:io';
+
 import 'package:appsonair_flutter_applink/models/referral_response.dart';
 import 'package:flutter/material.dart';
 
@@ -16,7 +19,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  String _platformVersion = 'Unknown';
+  String _linkDetails = 'No link detected!';
   final _appsonairFlutterApplinkPlugin = AppsonairFlutterApplink();
 
   @override
@@ -24,19 +27,19 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     _appsonairFlutterApplinkPlugin.initializeAppLink().listen((event) {
       setState(() {
-        _platformVersion = event.toString(); // Update UI with deep link
+        _linkDetails = event.toString(); // Update UI with deep link
       });
     });
   }
 
   Future<void> createLink() async {
-    String platformVersion;
+    String link;
     // Platform messages may fail, so we use a try/catch PlatformException.
     // We also handle the message potentially returning null.
     try {
-      platformVersion = await _appsonairFlutterApplinkPlugin.createAppLink() ?? 'No link found';
+      link = await _appsonairFlutterApplinkPlugin.createAppLink() ?? 'No link found';
     } on PlatformException {
-      platformVersion = 'Failed to create link.';
+      link = 'Failed to create link.';
     }
 
     // If the widget was removed from the tree while the asynchronous platform
@@ -45,28 +48,7 @@ class _MyAppState extends State<MyApp> {
     if (!mounted) return;
 
     setState(() {
-      _platformVersion = platformVersion;
-    });
-  }
-
-  Future<void> getReferral() async {
-    String platformVersion;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    // We also handle the message potentially returning null.
-    try {
-      ReferralResponse? data = await _appsonairFlutterApplinkPlugin.getReferralDetails();
-      platformVersion = data.installReferrer ?? "No data";
-    } on PlatformException {
-      platformVersion = 'No link found';
-    }
-
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) return;
-
-    setState(() {
-      _platformVersion = platformVersion;
+      _linkDetails = link;
     });
   }
 
@@ -83,7 +65,7 @@ class _MyAppState extends State<MyApp> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Center(
-                child: Text('Link :-> $_platformVersion\n'),
+                child: Text('Link :-> $_linkDetails\n'),
               ),
               Center(
                 child: TextButton(
@@ -93,14 +75,22 @@ class _MyAppState extends State<MyApp> {
                   child: const Text("Create Link"),
                 ),
               ),
-              Center(
-                child: TextButton(
-                  onPressed: () {
-                    getReferral();
-                  },
-                  child: const Text("Get Referral"),
+              if (Platform.isAndroid)
+                Center(
+                  child: TextButton(
+                    onPressed: () async {
+                      try {
+                        ReferralResponse? data = await _appsonairFlutterApplinkPlugin.getReferralDetails();
+                        setState(() {
+                          _linkDetails = data.installReferrer ?? "No data";
+                        });
+                      } on PlatformException catch (e) {
+                        log(e.toString());
+                      }
+                    },
+                    child: const Text("Get Referral"),
+                  ),
                 ),
-              ),
             ],
           ),
         ),

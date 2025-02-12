@@ -1,7 +1,7 @@
 class Options {
   String? url;
   String? prefixUrl;
-  CustomParams? customParams;
+  Map<String, dynamic>? customParams;
   SocialMeta? socialMeta;
   Analytics? analytics;
   bool? isShortLink;
@@ -14,14 +14,14 @@ class Options {
       this.customParams,
       this.socialMeta,
       this.analytics,
-      this.isShortLink,
+      this.isShortLink = true,
       this.androidFallbackUrl,
       this.iOSFallbackUrl});
 
   Options.fromJson(Map<String, dynamic> json) {
     url = json['url'];
     prefixUrl = json['prefixUrl'];
-    customParams = json['customParams'] != null ? CustomParams.fromJson(json['customParams']) : null;
+    customParams = json['customParams'] != null ? Map<String, dynamic>.from(json['customParams']) : null;
     socialMeta = json['socialMeta'] != null ? SocialMeta.fromJson(json['socialMeta']) : null;
     analytics = json['analytics'] != null ? Analytics.fromJson(json['analytics']) : null;
     isShortLink = json['isShortLink'];
@@ -34,7 +34,7 @@ class Options {
     data['url'] = url;
     data['prefixUrl'] = prefixUrl;
     if (customParams != null) {
-      data['customParams'] = customParams!.toJson();
+      data['customParams'] = customParams;
     }
     if (socialMeta != null) {
       data['socialMeta'] = socialMeta!.toJson();
@@ -49,42 +49,27 @@ class Options {
   }
 }
 
-class CustomParams {
-  String? referrer;
-
-  CustomParams({this.referrer});
-
-  CustomParams.fromJson(Map<String, dynamic> json) {
-    referrer = json['referrer'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['referrer'] = referrer;
-    return data;
-  }
-}
-
 class SocialMeta {
   String? title;
   String? description;
   String? imageUrl;
 
-  SocialMeta({this.title, this.description, this.imageUrl});
+  SocialMeta({
+    this.title,
+    this.description,
+    this.imageUrl,
+  });
 
-  SocialMeta.fromJson(Map<String, dynamic> json) {
-    title = json['title'];
-    description = json['description'];
-    imageUrl = json['imageUrl'];
-  }
+  SocialMeta.fromJson(Map<String, dynamic> json)
+      : title = json['title'],
+        description = json['description'],
+        imageUrl = json['imageUrl'];
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['title'] = title;
-    data['description'] = description;
-    data['imageUrl'] = imageUrl;
-    return data;
-  }
+  Map<String, dynamic> toJson() => {
+        if (title != null) 'title': title,
+        if (description != null) 'description': description,
+        if (imageUrl != null) 'imageUrl': imageUrl,
+      };
 }
 
 class Analytics {
@@ -94,23 +79,25 @@ class Analytics {
   String? utmMedium;
   String? utmCampaign;
 
-  Analytics({this.platform, this.campaign, this.utmSource, this.utmMedium, this.utmCampaign});
+  Analytics({
+    this.platform,
+    this.campaign,
+    this.utmSource,
+    this.utmMedium,
+    this.utmCampaign,
+  });
+  Analytics.fromJson(Map<String, dynamic> json)
+      : platform = json['platform'],
+        campaign = json['campaign'],
+        utmSource = json['utmSource'],
+        utmMedium = json['utmMedium'],
+        utmCampaign = json['utmCampaign'];
 
-  Analytics.fromJson(Map<String, dynamic> json) {
-    platform = json['platform'];
-    campaign = json['campaign'];
-    utmSource = json['utmSource'];
-    utmMedium = json['utmMedium'];
-    utmCampaign = json['utmCampaign'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['platform'] = platform;
-    data['campaign'] = campaign;
-    data['utmSource'] = utmSource;
-    data['utmMedium'] = utmMedium;
-    data['utmCampaign'] = utmCampaign;
-    return data;
-  }
+  Map<String, dynamic> toJson() => {
+        if (platform != null) 'platform': platform,
+        if (campaign != null) 'campaign': campaign,
+        if (utmSource != null) 'utmSource': utmSource,
+        if (utmMedium != null) 'utmMedium': utmMedium,
+        if (utmCampaign != null) 'utmCampaign': utmCampaign,
+      };
 }
