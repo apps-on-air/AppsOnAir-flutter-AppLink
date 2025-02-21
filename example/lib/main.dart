@@ -65,7 +65,10 @@ class _MyAppState extends State<MyApp> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Center(
-                child: Text('Link :-> $_linkDetails\n'),
+                child: Text(
+                  'Link :-> $_linkDetails\n',
+                  textAlign: TextAlign.center,
+                ),
               ),
               Center(
                 child: TextButton(
