@@ -85,7 +85,7 @@ class _MyAppState extends State<MyApp> {
                       try {
                         ReferralResponse? data = await _appsonairFlutterApplinkPlugin.getReferralDetails();
                         setState(() {
-                          _linkDetails = data.installReferrer ?? "No data";
+                          _linkDetails = data.toJson().toString();
                         });
                       } on PlatformException catch (e) {
                         log(e.toString());

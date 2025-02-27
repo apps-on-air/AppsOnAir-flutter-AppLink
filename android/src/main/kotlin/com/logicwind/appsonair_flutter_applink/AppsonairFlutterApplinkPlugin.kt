@@ -121,7 +121,7 @@ class AppsonairFlutterApplinkPlugin: FlutterPlugin, MethodCallHandler, ActivityA
     val deeplinkService = AppLinkService.getInstance(activity ?: return)
 
     if (intent != null) {
-      deeplinkService.initialize(intent, object : AppLinkListener {
+      deeplinkService.initialize(activity ?: return,intent, object : AppLinkListener {
         override fun onDeepLinkProcessed(uri: Uri, params: Map<String, String>) {
           val mapData= mapOf(
             "uri" to uri,
