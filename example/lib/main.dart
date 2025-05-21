@@ -1,7 +1,4 @@
-import 'dart:developer';
-import 'dart:io';
-
-import 'package:appsonair_flutter_applink/models/referral_response.dart';
+import 'package:appsonair_flutter_applink/models/app_link_params.dart';
 import 'package:flutter/material.dart';
 
 import 'package:appsonair_flutter_applink/appsonair_flutter_applink.dart';
@@ -37,7 +34,14 @@ class _MyAppState extends State<MyApp> {
     // Platform messages may fail, so we use a try/catch PlatformException.
     // We also handle the message potentially returning null.
     try {
-      link = await _appsonairFlutterApplinkPlugin.createAppLink() ?? 'No link found';
+      link = await _appsonairFlutterApplinkPlugin.createAppLink(
+            appLinkParams: AppLinkParams(
+              url: 'appsonair.com',
+              name: 'AppsOnAir',
+              urlPrefix: 'test-prefix.dev.appsonair.link',
+            ),
+          ) ??
+          'No link found';
     } on PlatformException {
       link = 'Failed to create link.';
     }
@@ -78,22 +82,6 @@ class _MyAppState extends State<MyApp> {
                   child: const Text("Create Link"),
                 ),
               ),
-              if (Platform.isAndroid)
-                Center(
-                  child: TextButton(
-                    onPressed: () async {
-                      try {
-                        ReferralResponse? data = await _appsonairFlutterApplinkPlugin.getReferralDetails();
-                        setState(() {
-                          _linkDetails = data.toJson().toString();
-                        });
-                      } on PlatformException catch (e) {
-                        log(e.toString());
-                      }
-                    },
-                    child: const Text("Get Referral"),
-                  ),
-                ),
             ],
           ),
         ),

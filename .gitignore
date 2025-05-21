@@ -16,6 +16,7 @@ migrate_working_dir/
 *.ipr
 *.iws
 .idea/
+.cxx/
 
 **/ios/**/Pods/
 **/ios/**/.symlinks/

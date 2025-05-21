@@ -1,12 +1,10 @@
 package com.logicwind.appsonair_flutter_applink
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import androidx.annotation.NonNull
 import com.appsonair.applink.interfaces.AppLinkListener
-import com.appsonair.applink.services.AppLinkHandler
 import com.appsonair.applink.services.AppLinkService
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
@@ -44,30 +42,45 @@ class AppsonairFlutterApplinkPlugin: FlutterPlugin, MethodCallHandler, ActivityA
     })
   }
 
-  private fun createAppLink(context: Context, result: Result, call: MethodCall){
-
-    val isShortLink: Boolean = call.argument<Boolean>("isShortLink") ?: false
+  private fun createAppLink( result: Result, call: MethodCall){
+    val deeplinkService = activity?.let { AppLinkService.getInstance(it.applicationContext) }
+    //val isShortLink: Boolean = call.argument<Boolean>("isShortLink") ?: false
     val url: String = call.argument<String>("url") ?: ""
-    val prefixUrl: String = call.argument<String>("prefixUrl") ?: ""
-    val androidFallbackUrl: String = call.argument<String>("androidFallbackUrl") ?: ""
-    val iOSFallbackUrl: String = call.argument<String>("iOSFallbackUrl") ?: ""
+    val name: String = call.argument<String>("name") ?: ""
+    val urlPrefix: String = call.argument<String>("urlPrefix") ?: ""
+    val prefixId: String? = call.argument<String>("prefixId") ?: null
+    val androidFallbackUrl: String? = call.argument<String>("androidFallbackUrl") ?: null
+    val iOSFallbackUrl: String? = call.argument<String>("iOSFallbackUrl") ?: null
 
-    val customParams: Map<String, Any> = call.argument<Map<String, Any>>("customParams") ?: emptyMap()
-    val socialMeta: Map<String, Any> = call.argument<Map<String, Any>>("socialMeta") ?: emptyMap()
-    val analytics: Map<String, Any> = call.argument<Map<String, Any>>("analytics") ?: emptyMap()
+    val customParams: Map<String, Any>? = call.argument<Map<String, Any>>("customParams") ?: null
+    val socialMeta: Map<String, Any>? = call.argument<Map<String, Any>>("socialMeta") ?: null
+    val analytics: Map<String, Any>? = call.argument<Map<String, Any>>("analytics") ?: null
+
+    val isOpenInBrowserAndroid: Boolean = call.argument<Boolean>("isOpenInBrowserAndroid") ?: false
+    val isOpenInAndroidApp: Boolean = call.argument<Boolean>("isOpenInAndroidApp") ?: true
+    val isOpenInBrowserApple: Boolean = call.argument<Boolean>("isOpenInBrowserApple") ?: false
+    val isOpenInIosApp: Boolean = call.argument<Boolean>("isOpenInIosApp") ?: true
+
+
+
 
 
     CoroutineScope(Dispatchers.Main).launch {
-      val data = AppLinkHandler.createAppLink(
-        url = url,
-        prefixUrl = prefixUrl,
-        customParams = customParams,
-        socialMeta = socialMeta,
-        analytics = analytics,
-        isShortLink = isShortLink,
-        androidFallbackUrl = androidFallbackUrl,
-        iOSFallbackUrl = iOSFallbackUrl,
-        context =context
+      val data = deeplinkService?.createAppLink(
+          name = name,
+          url = url,
+          urlPrefix = urlPrefix,
+          prefixId = prefixId,
+          customParams = customParams,
+          socialMeta = socialMeta,
+          analytics = analytics,
+          //isShortLink = isShortLink,
+          androidFallbackUrl = androidFallbackUrl,
+          iOSFallbackUrl = iOSFallbackUrl,
+          isOpenInAndroidApp = isOpenInAndroidApp,
+          isOpenInBrowserAndroid = isOpenInBrowserAndroid,
+          isOpenInBrowserApple = isOpenInBrowserApple,
+          isOpenInIosApp = isOpenInIosApp
       )
       result.success(data.toString())
     }
@@ -76,12 +89,13 @@ class AppsonairFlutterApplinkPlugin: FlutterPlugin, MethodCallHandler, ActivityA
   override fun onMethodCall(call: MethodCall, result: Result) {
     when (call.method) {
         "create_app_link" -> {
-          activity?.let { createAppLink(it.applicationContext,result,call) }
+          activity?.let { createAppLink(result,call) }
         }
         "get_referral_details" -> {
-          val deeplinkService = activity?.let { AppLinkService.getInstance(it.applicationContext) }
-          val referral = deeplinkService?.getReferralLink()
-          result.success(referral.toString())
+          result.notImplemented() // remove this line once referral gets enabled
+//          val deeplinkService = activity?.let { AppLinkService.getInstance(it.applicationContext) }
+//          val referral = deeplinkService?.getReferralDetails()
+//          result.success(referral.toString())
         }
         else -> {
           result.notImplemented()
@@ -135,13 +149,13 @@ class AppsonairFlutterApplinkPlugin: FlutterPlugin, MethodCallHandler, ActivityA
           Log.e("DeepLinkListener", "Error: $error")
         }
 
-        override fun onReferralLinkDetected(uri: Uri, params: Map<String, String>) {
-          val mapData= mapOf(
-            "uri" to uri,
-            "params" to params,
-          )
-          eventSink?.success(mapData.toString())  // Send deep link to Flutter
-        }
+//        override fun onReferralLinkDetected(uri: Uri, params: Map<String, String>) {
+//          val mapData= mapOf(
+//            "uri" to uri,
+//            "params" to params,
+//          )
+//          eventSink?.success(mapData.toString())  // Send deep link to Flutter
+//        }
       })
     }
   }

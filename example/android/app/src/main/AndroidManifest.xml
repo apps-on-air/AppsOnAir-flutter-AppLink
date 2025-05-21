@@ -31,7 +31,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:host="server.dev.appsonair.link"
+                    android:host="your domain"
                     android:scheme="https" />
             </intent-filter>
         </activity>
@@ -40,6 +40,9 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+        <meta-data
+            android:name="appId"
+            android:value="*********************" />
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

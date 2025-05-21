@@ -1,4 +1,4 @@
-import 'package:appsonair_flutter_applink/models/options.dart';
+import 'package:appsonair_flutter_applink/models/app_link_params.dart';
 import 'package:flutter/services.dart';
 
 import 'appsonair_flutter_applink_platform_interface.dart';
@@ -11,8 +11,8 @@ class MethodChannelAppsonairFlutterApplink extends AppsonairFlutterApplinkPlatfo
   final eventChannel = const EventChannel('appLinkEventChanel');
 
   @override
-  Future<String?> createAppLink({Options? options}) async {
-    final response = await methodChannel.invokeMethod<String>('create_app_link', options?.toJson());
+  Future<String?> createAppLink({required AppLinkParams appLinkParams}) async {
+    final response = await methodChannel.invokeMethod<String>('create_app_link', appLinkParams.toJson());
     return response;
   }
 

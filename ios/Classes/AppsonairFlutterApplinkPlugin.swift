@@ -43,15 +43,36 @@ public class AppsonairFlutterApplinkPlugin: NSObject, FlutterPlugin {
     }
     
     private func createAppLink(result: @escaping FlutterResult, call: FlutterMethodCall) {
-        AppLinkService.shared.getShortLink { latestLink in
+        guard let args = call.arguments as? [String: Any] else {
+            result("Invalid arguments")
+            return
+        }
+
+        let url = args["url"] as? String ?? ""
+        let name = args["name"] as? String ?? ""
+        let prefixId = args["prefixId"] as? String
+        let androidFallbackUrl = args["androidFallbackUrl"] as? String
+        let iOSFallbackUrl = args["iOSFallbackUrl"] as? String
+
+        let customParams = args["customParams"] as? [String: Any]
+        let socialMeta = args["socialMeta"] as? [String: Any]
+        //let analytics = args["analytics"] as? [String: Any]
+
+        let isOpenInBrowserAndroid = args["isOpenInBrowserAndroid"] as? Bool ?? false
+        let isOpenInAndroidApp = args["isOpenInAndroidApp"] as? Bool ?? true
+        let isOpenInBrowserApple = args["isOpenInBrowserApple"] as? Bool ?? false
+        let isOpenInIosApp = args["isOpenInIosApp"] as? Bool ?? true
+
+        AppLinkService.shared.createAppLink(url: url, name: name, prefixId: prefixId, customParams: customParams, socialMeta: socialMeta, isOpenInBrowserApple: isOpenInBrowserApple, isOpenInIosApp: isOpenInIosApp, iOSFallbackUrl: iOSFallbackUrl,isOpenInAndroidApp: isOpenInAndroidApp,isOpenInBrowserAndroid: isOpenInBrowserAndroid, androidFallbackUrl: androidFallbackUrl)  { latestLink in
             if let data = try? JSONSerialization.data(withJSONObject: latestLink, options: []),
                let jsonString = String(data: data, encoding: .utf8) {
-                result(jsonString)  // Return as a JSON string
+                result(jsonString)
             } else {
-                result("Error converting NSDictionary to String")
+                result("Error converting response to JSON string")
             }
         }
     }
+
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         switch call.method {
