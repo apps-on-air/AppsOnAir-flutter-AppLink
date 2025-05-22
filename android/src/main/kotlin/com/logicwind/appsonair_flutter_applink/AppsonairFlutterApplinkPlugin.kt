@@ -44,7 +44,6 @@ class AppsonairFlutterApplinkPlugin: FlutterPlugin, MethodCallHandler, ActivityA
 
   private fun createAppLink( result: Result, call: MethodCall){
     val deeplinkService = activity?.let { AppLinkService.getInstance(it.applicationContext) }
-    //val isShortLink: Boolean = call.argument<Boolean>("isShortLink") ?: false
     val url: String = call.argument<String>("url") ?: ""
     val name: String = call.argument<String>("name") ?: ""
     val urlPrefix: String = call.argument<String>("urlPrefix") ?: ""
@@ -61,10 +60,6 @@ class AppsonairFlutterApplinkPlugin: FlutterPlugin, MethodCallHandler, ActivityA
     val isOpenInBrowserApple: Boolean = call.argument<Boolean>("isOpenInBrowserApple") ?: false
     val isOpenInIosApp: Boolean = call.argument<Boolean>("isOpenInIosApp") ?: true
 
-
-
-
-
     CoroutineScope(Dispatchers.Main).launch {
       val data = deeplinkService?.createAppLink(
           name = name,
@@ -74,7 +69,6 @@ class AppsonairFlutterApplinkPlugin: FlutterPlugin, MethodCallHandler, ActivityA
           customParams = customParams,
           socialMeta = socialMeta,
           analytics = analytics,
-          //isShortLink = isShortLink,
           androidFallbackUrl = androidFallbackUrl,
           iOSFallbackUrl = iOSFallbackUrl,
           isOpenInAndroidApp = isOpenInAndroidApp,
