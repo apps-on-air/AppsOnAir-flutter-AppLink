@@ -17,6 +17,7 @@ import io.flutter.plugin.common.MethodChannel.Result
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 
 /** AppsonairFlutterApplinkPlugin */
 class AppsonairFlutterApplinkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
@@ -47,14 +48,10 @@ class AppsonairFlutterApplinkPlugin: FlutterPlugin, MethodCallHandler, ActivityA
     val url: String = call.argument<String>("url") ?: ""
     val name: String = call.argument<String>("name") ?: ""
     val urlPrefix: String = call.argument<String>("urlPrefix") ?: ""
-    val prefixId: String? = call.argument<String>("prefixId") ?: null
+    val shortId: String? = call.argument<String>("shortId") ?: null
     val androidFallbackUrl: String? = call.argument<String>("androidFallbackUrl") ?: null
     val iOSFallbackUrl: String? = call.argument<String>("iOSFallbackUrl") ?: null
-
-    val customParams: Map<String, Any>? = call.argument<Map<String, Any>>("customParams") ?: null
     val socialMeta: Map<String, Any>? = call.argument<Map<String, Any>>("socialMeta") ?: null
-    val analytics: Map<String, Any>? = call.argument<Map<String, Any>>("analytics") ?: null
-
     val isOpenInBrowserAndroid: Boolean = call.argument<Boolean>("isOpenInBrowserAndroid") ?: false
     val isOpenInAndroidApp: Boolean = call.argument<Boolean>("isOpenInAndroidApp") ?: true
     val isOpenInBrowserApple: Boolean = call.argument<Boolean>("isOpenInBrowserApple") ?: false
@@ -65,10 +62,8 @@ class AppsonairFlutterApplinkPlugin: FlutterPlugin, MethodCallHandler, ActivityA
           name = name,
           url = url,
           urlPrefix = urlPrefix,
-          prefixId = prefixId,
-          customParams = customParams,
+          shortId = shortId,
           socialMeta = socialMeta,
-          analytics = analytics,
           androidFallbackUrl = androidFallbackUrl,
           iOSFallbackUrl = iOSFallbackUrl,
           isOpenInAndroidApp = isOpenInAndroidApp,
@@ -130,12 +125,12 @@ class AppsonairFlutterApplinkPlugin: FlutterPlugin, MethodCallHandler, ActivityA
 
     if (intent != null) {
       deeplinkService.initialize(activity ?: return,intent, object : AppLinkListener {
-        override fun onDeepLinkProcessed(uri: Uri, params: Map<String, String>) {
+        override fun onDeepLinkProcessed(uri: Uri, result: JSONObject) {
           val mapData= mapOf(
-            "uri" to uri,
-            "params" to params,
+            "uri" to uri.toString(),
+            "result" to result,
             )
-          eventSink?.success(mapData.toString())  // Send deep link to Flutter
+          eventSink?.success(JSONObject(mapData).toString())
         }
 
         override fun onDeepLinkError(uri: Uri?, error: String) {

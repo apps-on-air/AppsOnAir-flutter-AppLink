@@ -38,7 +38,7 @@ class _MyAppState extends State<MyApp> {
             appLinkParams: AppLinkParams(
               url: 'appsonair.com',
               name: 'AppsOnAir',
-              urlPrefix: 'test-prefix.dev.appsonair.link',
+              urlPrefix: 'your url prefix',
             ),
           ) ??
           'No link found';
