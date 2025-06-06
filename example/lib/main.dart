@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:appsonair_flutter_applink/models/app_link_params.dart';
 import 'package:flutter/material.dart';
 
@@ -80,6 +81,21 @@ class _MyAppState extends State<MyApp> {
                     createLink();
                   },
                   child: const Text("Create Link"),
+                ),
+              ),
+              Center(
+                child: TextButton(
+                  onPressed: () async {
+                    try {
+                      var data = await _appsonairFlutterApplinkPlugin.getReferralDetails();
+                      setState(() {
+                        _linkDetails = data.toString();
+                      });
+                    } on PlatformException catch (e) {
+                      log(e.toString());
+                    }
+                  },
+                  child: const Text("Get Referral"),
                 ),
               ),
             ],

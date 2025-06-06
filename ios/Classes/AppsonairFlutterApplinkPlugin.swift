@@ -73,12 +73,26 @@ public class AppsonairFlutterApplinkPlugin: NSObject, FlutterPlugin {
             }
         }
     }
+    
+    private func getReferralDetails(result: @escaping FlutterResult, call: FlutterMethodCall) {
+        AppLinkService.shared.getReferralDetails {linkDetails in
+            if let data = try? JSONSerialization.data(withJSONObject: linkDetails, options: []),
+               let jsonString = String(data: data, encoding: .utf8) {
+                result(jsonString)
+            } else {
+                result("Error converting response to JSON string")
+            }
+        }
+           
+    }
 
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         switch call.method {
         case "create_app_link":
             createAppLink(result: result, call: call)
+        case "get_referral_details":
+            getReferralDetails(result: result, call: call)
         default:
             result(FlutterMethodNotImplemented)
         }

@@ -81,10 +81,9 @@ class AppsonairFlutterApplinkPlugin: FlutterPlugin, MethodCallHandler, ActivityA
           activity?.let { createAppLink(result,call) }
         }
         "get_referral_details" -> {
-          result.notImplemented() // remove this line once referral gets enabled
-//          val deeplinkService = activity?.let { AppLinkService.getInstance(it.applicationContext) }
-//          val referral = deeplinkService?.getReferralDetails()
-//          result.success(referral.toString())
+          val deeplinkService = activity?.let { AppLinkService.getInstance(it.applicationContext) }
+          val referral = deeplinkService?.getReferralDetails()
+          result.success(referral.toString())
         }
         else -> {
           result.notImplemented()
