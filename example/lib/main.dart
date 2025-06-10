@@ -17,8 +17,9 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  String _linkDetails = 'No link detected!';
+  String _linkDetails = '';
   final _appsonairFlutterApplinkPlugin = AppsonairFlutterApplink();
+  TextEditingController txtController = TextEditingController();
 
   @override
   void initState() {
@@ -35,14 +36,16 @@ class _MyAppState extends State<MyApp> {
     // Platform messages may fail, so we use a try/catch PlatformException.
     // We also handle the message potentially returning null.
     try {
-      link = await _appsonairFlutterApplinkPlugin.createAppLink(
-            appLinkParams: AppLinkParams(
-              url: 'appsonair.com',
-              name: 'AppsOnAir',
-              urlPrefix: 'your url prefix',
-            ),
-          ) ??
-          'No link found';
+      var data = await _appsonairFlutterApplinkPlugin.createAppLink(
+        appLinkParams: AppLinkParams(
+          url: 'https://appsonair.com',
+          name: 'AppsOnAir',
+          urlPrefix: 'your url prefix',
+          shortId: txtController.text.trim(),
+        ),
+      );
+      link = data.toString();
+      txtController.clear();
     } on PlatformException {
       link = 'Failed to create link.';
     }
@@ -62,29 +65,36 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Plugin example app'),
+          title: const Text('Flutter AppLink Example'),
+          centerTitle: true,
         ),
         body: Padding(
           padding: const EdgeInsets.all(12),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Center(
-                child: Text(
-                  'Link :-> $_linkDetails\n',
-                  textAlign: TextAlign.center,
+              const SizedBox(height: 40),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: TextField(
+                  controller: txtController,
+                  decoration:
+                      const InputDecoration(hintText: "Enter short link id if needed", border: OutlineInputBorder()),
                 ),
               ),
+              const SizedBox(height: 20),
               Center(
                 child: TextButton(
+                  style: ButtonStyle(backgroundColor: WidgetStateProperty.all<Color>(Colors.greenAccent)),
                   onPressed: () {
                     createLink();
                   },
-                  child: const Text("Create Link"),
+                  child: const Text("Create App Link"),
                 ),
               ),
+              const SizedBox(height: 10),
               Center(
                 child: TextButton(
+                  style: ButtonStyle(backgroundColor: WidgetStateProperty.all<Color>(Colors.tealAccent)),
                   onPressed: () async {
                     try {
                       var data = await _appsonairFlutterApplinkPlugin.getReferralDetails();
@@ -95,9 +105,17 @@ class _MyAppState extends State<MyApp> {
                       log(e.toString());
                     }
                   },
-                  child: const Text("Get Referral"),
+                  child: const Text("Get Referral Link"),
                 ),
               ),
+              const SizedBox(height: 40),
+              Flexible(
+                child: Text(
+                  _linkDetails,
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              const SizedBox(height: 50)
             ],
           ),
         ),

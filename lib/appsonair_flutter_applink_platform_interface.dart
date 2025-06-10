@@ -24,15 +24,15 @@ abstract class AppsonairFlutterApplinkPlatform extends PlatformInterface {
     _instance = instance;
   }
 
-  Future<String?> getReferralDetails() {
+  Future<Map<String, dynamic>?> getReferralDetails() {
     throw UnimplementedError('platformVersion() has not been implemented.');
   }
 
-  Future<String?> createAppLink({required AppLinkParams appLinkParams}) {
+  Future<Map<String, dynamic>?> createAppLink({required AppLinkParams appLinkParams}) {
     throw UnimplementedError('platformVersion() has not been implemented.');
   }
 
-  Stream<String?> initializeAppLink() {
+  Stream<Map<String, dynamic>?> initializeAppLink() {
     throw UnimplementedError('platformVersion() has not been implemented.');
   }
 }

@@ -12,6 +12,7 @@ This plugin is currently in **pre-production**. While the plugin is fully functi
 - ✅ Deep link support (URI scheme, App Links)
 - ✅ Fallback behavior (e.g., open Play Store, App Store)
 - ✅ Custom domain support
+- ✅ Referral tracking
 - ✅ Firebase dynamic link migration to AppLink(Coming Soon)
 
 ## Minimum Requirements
@@ -115,6 +116,18 @@ allprojects {
  </intent-filter>
 ```
 
+#### Add below code if you are using custom uri scheme.
+```sh
+ <intent-filter>
+    <action android:name="android.intent.action.VIEW" />
+    <category android:name="android.intent.category.DEFAULT" />
+    <category android:name="android.intent.category.BROWSABLE" />
+    <data
+     android:host="open"
+     android:scheme="your scheme" />
+</intent-filter>
+```
+
 
 ## Example :
 
@@ -134,8 +147,11 @@ await _appsonairFlutterApplinkPlugin.createAppLink(
 #### Listen the AppLink
 ```
     _appsonairFlutterApplinkPlugin.initializeAppLink().listen((event) {
-      setState(() {
-        _linkDetails = event.toString(); // Update UI with deep link
-      });
+      // Handle received link here...
     });
+```
+
+#### To retrieving the referral link
+```
+    var data = await _appsonairFlutterApplinkPlugin.getReferralDetails();
 ```

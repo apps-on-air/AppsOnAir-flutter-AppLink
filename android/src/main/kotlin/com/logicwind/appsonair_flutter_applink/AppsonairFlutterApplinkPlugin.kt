@@ -137,13 +137,6 @@ class AppsonairFlutterApplinkPlugin: FlutterPlugin, MethodCallHandler, ActivityA
           Log.e("DeepLinkListener", "Error: $error")
         }
 
-//        override fun onReferralLinkDetected(uri: Uri, params: Map<String, String>) {
-//          val mapData= mapOf(
-//            "uri" to uri,
-//            "params" to params,
-//          )
-//          eventSink?.success(mapData.toString())  // Send deep link to Flutter
-//        }
       })
     }
   }

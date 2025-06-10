@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:appsonair_flutter_applink/models/app_link_params.dart';
 import 'package:flutter/services.dart';
 
@@ -11,19 +13,19 @@ class MethodChannelAppsonairFlutterApplink extends AppsonairFlutterApplinkPlatfo
   final eventChannel = const EventChannel('appLinkEventChanel');
 
   @override
-  Future<String?> createAppLink({required AppLinkParams appLinkParams}) async {
-    final response = await methodChannel.invokeMethod<String>('create_app_link', appLinkParams.toJson());
-    return response;
+  Future<Map<String, dynamic>?> createAppLink({required AppLinkParams appLinkParams}) async {
+    final response = await methodChannel.invokeMethod('create_app_link', appLinkParams.toJson());
+    return jsonDecode(response);
   }
 
   @override
-  Future<String?> getReferralDetails() async {
-    final response = await methodChannel.invokeMethod<String>('get_referral_details');
-    return response;
+  Future<Map<String, dynamic>?> getReferralDetails() async {
+    final response = await methodChannel.invokeMethod('get_referral_details');
+    return jsonDecode(response);
   }
 
   @override
-  Stream<String?> initializeAppLink() {
-    return eventChannel.receiveBroadcastStream().map((event) => event as String?);
+  Stream<Map<String, dynamic>?> initializeAppLink() {
+    return eventChannel.receiveBroadcastStream().map((event) => jsonDecode(event));
   }
 }
