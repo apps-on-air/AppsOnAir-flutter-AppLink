@@ -31,7 +31,9 @@ class AppLinkParams {
       name: json['name'] ?? '',
       urlPrefix: json['urlPrefix'] ?? '',
       shortId: json['shortId'],
-      socialMeta: json['socialMeta'] != null ? SocialMeta.fromJson(json['socialMeta']) : null,
+      socialMeta: json['socialMeta'] != null
+          ? SocialMeta.fromJson(json['socialMeta'])
+          : null,
       isOpenInBrowserAndroid: json['isOpenInBrowserAndroid'],
       isOpenInAndroidApp: json['isOpenInAndroidApp'],
       isOpenInBrowserApple: json['isOpenInBrowserApple'],

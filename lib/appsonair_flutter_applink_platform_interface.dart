@@ -9,7 +9,8 @@ abstract class AppsonairFlutterApplinkPlatform extends PlatformInterface {
 
   static final Object _token = Object();
 
-  static AppsonairFlutterApplinkPlatform _instance = MethodChannelAppsonairFlutterApplink();
+  static AppsonairFlutterApplinkPlatform _instance =
+      MethodChannelAppsonairFlutterApplink();
 
   /// The default instance of [AppsonairFlutterApplinkPlatform] to use.
   ///
@@ -28,7 +29,8 @@ abstract class AppsonairFlutterApplinkPlatform extends PlatformInterface {
     throw UnimplementedError('platformVersion() has not been implemented.');
   }
 
-  Future<Map<String, dynamic>?> createAppLink({required AppLinkParams appLinkParams}) {
+  Future<Map<String, dynamic>?> createAppLink(
+      {required AppLinkParams appLinkParams}) {
     throw UnimplementedError('platformVersion() has not been implemented.');
   }
 

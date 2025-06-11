@@ -33,15 +33,19 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> createLink() async {
     String link;
+    String? shortId;
     // Platform messages may fail, so we use a try/catch PlatformException.
     // We also handle the message potentially returning null.
     try {
+      if (txtController.text.trim().isNotEmpty) {
+        shortId = txtController.text.trim();
+      }
       var data = await _appsonairFlutterApplinkPlugin.createAppLink(
         appLinkParams: AppLinkParams(
           url: 'https://appsonair.com',
           name: 'AppsOnAir',
           urlPrefix: 'your url prefix',
-          shortId: txtController.text.trim(),
+          shortId: shortId,
         ),
       );
       link = data.toString();

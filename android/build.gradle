@@ -54,7 +54,7 @@ android {
     }
 
     dependencies {
-        implementation 'com.github.apps-on-air:AppsOnAir-Android-AppLink:0.0.3'
+        implementation 'com.github.apps-on-air:AppsOnAir-Android-AppLink:0.0.4'
         testImplementation("org.jetbrains.kotlin:kotlin-test")
         testImplementation("org.mockito:mockito-core:5.0.0")
     }
