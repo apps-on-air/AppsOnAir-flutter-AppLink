@@ -81,14 +81,17 @@ class _MyAppState extends State<MyApp> {
                 padding: const EdgeInsets.symmetric(horizontal: 10),
                 child: TextField(
                   controller: txtController,
-                  decoration:
-                      const InputDecoration(hintText: "Enter short link id if needed", border: OutlineInputBorder()),
+                  decoration: const InputDecoration(
+                      hintText: "Enter short link id if needed",
+                      border: OutlineInputBorder()),
                 ),
               ),
               const SizedBox(height: 20),
               Center(
                 child: TextButton(
-                  style: ButtonStyle(backgroundColor: WidgetStateProperty.all<Color>(Colors.greenAccent)),
+                  style: ButtonStyle(
+                      backgroundColor:
+                          WidgetStateProperty.all<Color>(Colors.greenAccent)),
                   onPressed: () {
                     createLink();
                   },
@@ -98,10 +101,13 @@ class _MyAppState extends State<MyApp> {
               const SizedBox(height: 10),
               Center(
                 child: TextButton(
-                  style: ButtonStyle(backgroundColor: WidgetStateProperty.all<Color>(Colors.tealAccent)),
+                  style: ButtonStyle(
+                      backgroundColor:
+                          WidgetStateProperty.all<Color>(Colors.tealAccent)),
                   onPressed: () async {
                     try {
-                      var data = await _appsonairFlutterApplinkPlugin.getReferralDetails();
+                      var data = await _appsonairFlutterApplinkPlugin
+                          .getReferralDetails();
                       setState(() {
                         _linkDetails = data.toString();
                       });
