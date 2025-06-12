@@ -1,7 +1,7 @@
 ## ![pub package](https://appsonair.com/images/logo.svg)
 # AppsOnAir-flutter-AppLink
 
-**AppsOnAir-flutter-AppLink** enables you to handle deep links, and in-app routing seamlessly in your Android app. With a simple integration, you can configure, manage, and act on links from the web dashboard in real time and for more detail refer [documentation](https://documentation.appsonair.com/MobileQuickstart/GettingStarted/).
+**AppsOnAir-flutter-AppLink** enables you to handle deep links, and in-app routing seamlessly in your app. With a simple integration, you can configure, manage, and act on links from the web dashboard in real time and for more detail refer [documentation](https://documentation.appsonair.com/MobileQuickstart/GettingStarted/).
 
 ## ⚠️ Important Notice ⚠️
 
