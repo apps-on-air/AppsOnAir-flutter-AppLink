@@ -13,6 +13,7 @@ class MethodChannelAppsonairFlutterApplink
   final methodChannel = const MethodChannel('appsOnAirAppLink');
   final eventChannel = const EventChannel('appLinkEventChanel');
 
+  ///Pass the AppLinkParams data to native api and provide the response received from native api to flutter
   @override
   Future<Map<String, dynamic>?> createAppLink(
       {required AppLinkParams appLinkParams}) async {
@@ -21,12 +22,14 @@ class MethodChannelAppsonairFlutterApplink
     return jsonDecode(response);
   }
 
+  ///Provides data data received from native api to flutter for referral tracking
   @override
   Future<Map<String, dynamic>?> getReferralDetails() async {
     final response = await methodChannel.invokeMethod('get_referral_details');
     return jsonDecode(response);
   }
 
+  ///Initialize the applink service in your application for link tracking and deeplinking
   @override
   Stream<Map<String, dynamic>?> initializeAppLink() {
     return eventChannel
