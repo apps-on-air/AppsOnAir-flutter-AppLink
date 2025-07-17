@@ -1,3 +1,7 @@
+## 1.0.0
+
+* Initial stable release.
+
 ## 0.0.3
 
 * Dependency upgrades and improvements.
