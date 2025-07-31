@@ -55,16 +55,16 @@ public class AppsonairFlutterApplinkPlugin: NSObject, FlutterPlugin {
         let shortId = args["shortId"] as? String ?? nil
         let urlPrefix = args["urlPrefix"] as? String ?? ""
         let androidFallbackUrl = args["androidFallbackUrl"] as? String
-        let iOSFallbackUrl = args["iOSFallbackUrl"] as? String
+        let iosFallbackUrl = args["iosFallbackUrl"] as? String
 
         let socialMeta = args["socialMeta"] as? [String: Any]
 
-        let isOpenInBrowserAndroid = args["isOpenInBrowserAndroid"] as? Bool ?? false
-        let isOpenInAndroidApp = args["isOpenInAndroidApp"] as? Bool ?? true
-        let isOpenInBrowserApple = args["isOpenInBrowserApple"] as? Bool ?? false
-        let isOpenInIosApp = args["isOpenInIosApp"] as? Bool ?? true
+        let isOpenInBrowserAndroid = args["isOpenInBrowserAndroid"] as? Bool ?? nil
+        let isOpenInAndroidApp = args["isOpenInAndroidApp"] as? Bool ?? nil
+        let isOpenInBrowserApple = args["isOpenInBrowserApple"] as? Bool ?? nil
+        let isOpenInIosApp = args["isOpenInIosApp"] as? Bool ?? nil
 
-        AppLinkService.shared.createAppLink(url: url, name: name, urlPrefix: urlPrefix, shortId: shortId, socialMeta: socialMeta, isOpenInBrowserApple: isOpenInBrowserApple, isOpenInIosApp: isOpenInIosApp, iOSFallbackUrl: iOSFallbackUrl,isOpenInAndroidApp: isOpenInAndroidApp,isOpenInBrowserAndroid: isOpenInBrowserAndroid, androidFallbackUrl: androidFallbackUrl)  { latestLink in
+        AppLinkService.shared.createAppLink(url: url, name: name, urlPrefix: urlPrefix, shortId: shortId, socialMeta: socialMeta, isOpenInBrowserApple: isOpenInBrowserApple, isOpenInIosApp: isOpenInIosApp, iosFallbackUrl: iosFallbackUrl,isOpenInAndroidApp: isOpenInAndroidApp,isOpenInBrowserAndroid: isOpenInBrowserAndroid, androidFallbackUrl: androidFallbackUrl)  { latestLink in
             if let data = try? JSONSerialization.data(withJSONObject: latestLink, options: []),
                let jsonString = String(data: data, encoding: .utf8) {
                 result(jsonString)

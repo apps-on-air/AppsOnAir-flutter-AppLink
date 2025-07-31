@@ -23,7 +23,7 @@ class AppLinkParams {
   final String? androidFallbackUrl;
 
   /// Optional fallback URL for iOS devices if the app is not installed.
-  final String? iOSFallbackUrl;
+  final String? iosFallbackUrl;
 
   /// Indicates whether the link should open in the browser on Android.
   final bool? isOpenInBrowserAndroid;
@@ -45,11 +45,11 @@ class AppLinkParams {
     this.shortId,
     this.socialMeta,
     this.androidFallbackUrl,
-    this.iOSFallbackUrl,
-    this.isOpenInBrowserAndroid = false,
-    this.isOpenInAndroidApp = true,
-    this.isOpenInBrowserApple = false,
-    this.isOpenInIosApp = true,
+    this.iosFallbackUrl,
+    this.isOpenInBrowserAndroid,
+    this.isOpenInAndroidApp,
+    this.isOpenInBrowserApple,
+    this.isOpenInIosApp,
   });
 
   /// Creates an [AppLinkParams] instance from a JSON [Map].
@@ -70,7 +70,7 @@ class AppLinkParams {
       isOpenInBrowserApple: json['isOpenInBrowserApple'],
       isOpenInIosApp: json['isOpenInIosApp'],
       androidFallbackUrl: json['androidFallbackUrl'],
-      iOSFallbackUrl: json['iOSFallbackUrl'],
+      iosFallbackUrl: json['iosFallbackUrl'],
     );
   }
 
@@ -92,7 +92,7 @@ class AppLinkParams {
     data['isOpenInIosApp'] = isOpenInIosApp;
     data['isOpenInAndroidApp'] = isOpenInAndroidApp;
     data['androidFallbackUrl'] = androidFallbackUrl;
-    data['iOSFallbackUrl'] = iOSFallbackUrl;
+    data['iosFallbackUrl'] = iosFallbackUrl;
     return data;
   }
 }

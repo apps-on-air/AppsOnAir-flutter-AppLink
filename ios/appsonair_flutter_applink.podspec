@@ -4,7 +4,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'appsonair_flutter_applink'
-  s.version          = '1.0.0'
+  s.version          = '1.1.0'
   s.summary          = 'A new Flutter plugin project.'
   s.description      = <<-DESC
 A new Flutter plugin project.
@@ -16,7 +16,7 @@ A new Flutter plugin project.
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
   s.platform = :ios, '13.0'
-  s.dependency 'AppsOnAir-AppLink', '1.0.0'
+  s.dependency 'AppsOnAir-AppLink', '1.1.0'
 
   # Flutter.framework does not contain a i386 slice.
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }
