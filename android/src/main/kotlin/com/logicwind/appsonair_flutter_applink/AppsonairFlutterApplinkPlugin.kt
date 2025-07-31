@@ -50,12 +50,12 @@ class AppsonairFlutterApplinkPlugin: FlutterPlugin, MethodCallHandler, ActivityA
     val urlPrefix: String = call.argument<String>("urlPrefix") ?: ""
     val shortId: String? = call.argument<String>("shortId") ?: null
     val androidFallbackUrl: String? = call.argument<String>("androidFallbackUrl") ?: null
-    val iOSFallbackUrl: String? = call.argument<String>("iOSFallbackUrl") ?: null
+    val iosFallbackUrl: String? = call.argument<String>("iosFallbackUrl") ?: null
     val socialMeta: Map<String, Any>? = call.argument<Map<String, Any>>("socialMeta") ?: null
-    val isOpenInBrowserAndroid: Boolean = call.argument<Boolean>("isOpenInBrowserAndroid") ?: false
-    val isOpenInAndroidApp: Boolean = call.argument<Boolean>("isOpenInAndroidApp") ?: true
-    val isOpenInBrowserApple: Boolean = call.argument<Boolean>("isOpenInBrowserApple") ?: false
-    val isOpenInIosApp: Boolean = call.argument<Boolean>("isOpenInIosApp") ?: true
+    val isOpenInBrowserAndroid: Boolean? = call.argument<Boolean>("isOpenInBrowserAndroid") ?: null
+    val isOpenInAndroidApp: Boolean? = call.argument<Boolean>("isOpenInAndroidApp") ?: null
+    val isOpenInBrowserApple: Boolean? = call.argument<Boolean>("isOpenInBrowserApple") ?: null
+    val isOpenInIosApp: Boolean? = call.argument<Boolean>("isOpenInIosApp") ?: null
 
     CoroutineScope(Dispatchers.Main).launch {
       val data = deeplinkService?.createAppLink(
@@ -65,7 +65,7 @@ class AppsonairFlutterApplinkPlugin: FlutterPlugin, MethodCallHandler, ActivityA
           shortId = shortId,
           socialMeta = socialMeta,
           androidFallbackUrl = androidFallbackUrl,
-          iOSFallbackUrl = iOSFallbackUrl,
+          iosFallbackUrl = iosFallbackUrl,
           isOpenInAndroidApp = isOpenInAndroidApp,
           isOpenInBrowserAndroid = isOpenInBrowserAndroid,
           isOpenInBrowserApple = isOpenInBrowserApple,
