@@ -44,8 +44,19 @@ class _MyAppState extends State<MyApp> {
         appLinkParams: AppLinkParams(
           url: 'https://appsonair.com',
           name: 'AppsOnAir',
-          urlPrefix: 'your url prefix',
-          shortId: shortId,
+          urlPrefix: 'YOUR_DOMAIN_NAME', //shouldn't contain http or https
+          shortId: shortId, // If not set, it will be auto-generated
+          socialMeta: SocialMeta(
+            title: 'link title',
+            description: 'link description',
+            imageUrl: 'https://image.png',
+          ),
+          androidFallbackUrl: 'https://playstore.com/app',
+          iosFallbackUrl: 'https://appstore.com/app',
+          isOpenInAndroidApp: true,
+          isOpenInBrowserAndroid: false,
+          isOpenInIosApp: true,
+          isOpenInBrowserApple: false,
         ),
       );
       link = data.toString();

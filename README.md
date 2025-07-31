@@ -133,11 +133,23 @@ allprojects {
 final _appsonairFlutterApplinkPlugin = AppsonairFlutterApplink();
 await _appsonairFlutterApplinkPlugin.createAppLink(
         appLinkParams: AppLinkParams(
-        url: 'https://appsonair.com',
-        name: 'AppsOnAir',
-        urlPrefix: 'YOUR_DOMAIN_NAME' //shouldn't contain http or https
-       ),)
-
+          url: 'https://appsonair.com',
+          name: 'AppsOnAir',
+          urlPrefix: 'YOUR_DOMAIN_NAME', //shouldn't contain http or https
+          shortId: 'LINK_ID', // If not set, it will be auto-generated
+          socialMeta: SocialMeta(
+            title: 'link title',
+            description: 'link description',
+            imageUrl: 'https://image.png',
+          ),
+          androidFallbackUrl: 'https://playstore/app.com',
+          iosFallbackUrl: 'https://appstore/app.com',
+          isOpenInAndroidApp: true,
+          isOpenInBrowserAndroid: false,
+          isOpenInIosApp: true,
+          isOpenInBrowserApple: false,
+        ),
+      );
 ```
 
 #### Listen the AppLink
