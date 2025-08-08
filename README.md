@@ -5,11 +5,13 @@
 
 ## 🚀 Features
 
-- ✅ Deep link support (URI scheme, App Links)
+- ✅ Deep link support (URI scheme, AppLinks)
 - ✅ Fallback behavior (e.g., open Play Store, App Store)
 - ✅ Custom domain support
 - ✅ Referral tracking
-- ✅ Seamless firebase dynamic link migration to AppLink
+- ✅ Seamless migration from Firebase Dynamic Links to AppLink
+
+**Note:** For comprehensive instructions on migrating Firebase Dynamic Links to AppLink, refer to the [documentation](https://documentation.appsonair.com/MobileQuickstart/AppLink/firebase-dynamiclinks-migration).
 
 ## Minimum Requirements
 
