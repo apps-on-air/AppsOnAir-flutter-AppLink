@@ -44,7 +44,7 @@ class AppsonairFlutterApplinkPlugin: FlutterPlugin, MethodCallHandler, ActivityA
   }
 
   private fun createAppLink( result: Result, call: MethodCall){
-    val deeplinkService = activity?.let { AppLinkService.getInstance(it.applicationContext) }
+    val appLinkService = activity?.let { AppLinkService.getInstance(it.applicationContext) }
     val url: String = call.argument<String>("url") ?: ""
     val name: String = call.argument<String>("name") ?: ""
     val urlPrefix: String = call.argument<String>("urlPrefix") ?: ""
@@ -58,7 +58,7 @@ class AppsonairFlutterApplinkPlugin: FlutterPlugin, MethodCallHandler, ActivityA
     val isOpenInIosApp: Boolean? = call.argument<Boolean>("isOpenInIosApp") ?: null
 
     CoroutineScope(Dispatchers.Main).launch {
-      val data = deeplinkService?.createAppLink(
+      val data = appLinkService?.createAppLink(
           name = name,
           url = url,
           urlPrefix = urlPrefix,
@@ -81,8 +81,8 @@ class AppsonairFlutterApplinkPlugin: FlutterPlugin, MethodCallHandler, ActivityA
           activity?.let { createAppLink(result,call) }
         }
         "get_referral_details" -> {
-          val deeplinkService = activity?.let { AppLinkService.getInstance(it.applicationContext) }
-          val referral = deeplinkService?.getReferralDetails()
+          val appLinkService = activity?.let { AppLinkService.getInstance(it.applicationContext) }
+          val referral = appLinkService?.getReferralDetails()
           result.success(referral.toString())
         }
         else -> {
@@ -120,10 +120,10 @@ class AppsonairFlutterApplinkPlugin: FlutterPlugin, MethodCallHandler, ActivityA
 
   // Handle deep links from intents
   private fun handleIntent(intent: Intent?) {
-    val deeplinkService = AppLinkService.getInstance(activity ?: return)
+    val appLinkService = AppLinkService.getInstance(activity ?: return)
 
     if (intent != null) {
-      deeplinkService.initialize(activity ?: return,intent, object : AppLinkListener {
+      appLinkService.initialize(activity ?: return,intent, object : AppLinkListener {
         override fun onDeepLinkProcessed(uri: Uri, result: JSONObject) {
           val mapData= mapOf(
             "uri" to uri.toString(),
