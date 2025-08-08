@@ -1,4 +1,9 @@
+## 1.1.1
+
+* Readme file updated.
+
 ## 1.1.0
+
 **Breaking Changes:**
 * Changed parameter `iOSFallbackUrl` to `iosFallbackUrl` in the `createAppLink` method.
 * Bugs fixes and improvements

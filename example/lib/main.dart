@@ -106,7 +106,7 @@ class _MyAppState extends State<MyApp> {
                   onPressed: () {
                     createLink();
                   },
-                  child: const Text("Create App Link"),
+                  child: const Text("Create AppLink"),
                 ),
               ),
               const SizedBox(height: 10),
