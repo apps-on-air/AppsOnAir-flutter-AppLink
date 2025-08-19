@@ -1,3 +1,7 @@
+## 1.1.2
+
+* Dependencies upgrade and improvements.
+
 ## 1.1.1
 
 * Readme file updated.
