@@ -1,3 +1,7 @@
+## 1.1.3
+
+* Provided additional details in `getReferralDetails` method in android.
+
 ## 1.1.2
 
 * Dependencies upgrade and improvements.
