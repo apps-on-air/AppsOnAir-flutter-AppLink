@@ -163,5 +163,7 @@ await _appsonairFlutterApplinkPlugin.createAppLink(
 
 #### To retrieving the referral link
 ```
+   // If you call getReferralDetails() immediately after  initialization, you may need to add a short delay to ensure the referral data is available.
+
     var data = await _appsonairFlutterApplinkPlugin.getReferralDetails();
 ```
