@@ -24,7 +24,9 @@ class AppsonairFlutterApplinkPlugin: FlutterPlugin, MethodCallHandler, ActivityA
 
   private lateinit var channel: MethodChannel
   private lateinit var eventChannel: EventChannel
+  private lateinit var referralEventChannel: EventChannel
   private var eventSink: EventChannel.EventSink? = null
+  private var referralEventSink: EventChannel.EventSink? = null
   private var activity: Activity? = null
 
   override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
@@ -32,6 +34,7 @@ class AppsonairFlutterApplinkPlugin: FlutterPlugin, MethodCallHandler, ActivityA
     channel.setMethodCallHandler(this)
 
     eventChannel = EventChannel(flutterPluginBinding.binaryMessenger, "appLinkEventChanel")
+    referralEventChannel = EventChannel(flutterPluginBinding.binaryMessenger, "appLinkReferralEventChanel")
     eventChannel.setStreamHandler(object : EventChannel.StreamHandler {
       override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
         eventSink = events
@@ -39,6 +42,15 @@ class AppsonairFlutterApplinkPlugin: FlutterPlugin, MethodCallHandler, ActivityA
 
       override fun onCancel(arguments: Any?) {
         eventSink = null
+      }
+    })
+    referralEventChannel.setStreamHandler(object : EventChannel.StreamHandler {
+      override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
+        referralEventSink = events
+      }
+
+      override fun onCancel(arguments: Any?) {
+        referralEventSink = null
       }
     })
   }
@@ -85,6 +97,13 @@ class AppsonairFlutterApplinkPlugin: FlutterPlugin, MethodCallHandler, ActivityA
           val referral = appLinkService?.getReferralDetails()
           result.success(referral.toString())
         }
+       "get_referral_info" -> {
+        val appLinkService = activity?.let { AppLinkService.getInstance(it.applicationContext) }
+        CoroutineScope(Dispatchers.Main).launch {
+          val referral = appLinkService?.getReferralInfo()
+          result.success(referral.toString())
+         }
+       }
         else -> {
           result.notImplemented()
         }
@@ -94,6 +113,7 @@ class AppsonairFlutterApplinkPlugin: FlutterPlugin, MethodCallHandler, ActivityA
   override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
     channel.setMethodCallHandler(null)
     eventSink = null
+    referralEventSink = null
   }
 
   // Handle activity attachment and detachment
@@ -130,6 +150,10 @@ class AppsonairFlutterApplinkPlugin: FlutterPlugin, MethodCallHandler, ActivityA
             "result" to result,
             )
           eventSink?.success(JSONObject(mapData).toString())
+        }
+
+        override fun onReferralLinkDetected( result: JSONObject) {
+          referralEventSink?.success(result.toString())
         }
 
         override fun onDeepLinkError(uri: Uri?, error: String) {
