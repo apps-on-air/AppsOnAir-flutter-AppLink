@@ -1,3 +1,10 @@
+## 1.2.0
+
+* `getReferralDetails()` method is now deprecated use `getReferralInfo()` instead.
+
+* Introduced `onReferralLinkDetected()` listner.
+    * It is triggered only when the app is installed and launched for the first time with a referral details.
+
 ## 1.1.3
 
 * Provided additional details in `getReferralDetails` method in android.
