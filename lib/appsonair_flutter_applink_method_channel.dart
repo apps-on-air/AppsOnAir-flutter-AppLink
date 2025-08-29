@@ -12,6 +12,8 @@ class MethodChannelAppsonairFlutterApplink
 
   final methodChannel = const MethodChannel('appsOnAirAppLink');
   final eventChannel = const EventChannel('appLinkEventChanel');
+  final appLinkReferralEventChanel =
+      const EventChannel('appLinkReferralEventChanel');
 
   ///Pass the AppLinkParams data to native api and provide the response received from native api to flutter
   @override
@@ -24,8 +26,16 @@ class MethodChannelAppsonairFlutterApplink
 
   ///Provides data data received from native api to flutter for referral tracking
   @override
+  @Deprecated('Use getReferralInfo() instead')
   Future<Map<String, dynamic>?> getReferralDetails() async {
     final response = await methodChannel.invokeMethod('get_referral_details');
+    return jsonDecode(response);
+  }
+
+  ///Provides data data received from native api to flutter for referral tracking
+  @override
+  Future<Map<String, dynamic>?> getReferralInfo() async {
+    final response = await methodChannel.invokeMethod('get_referral_info');
     return jsonDecode(response);
   }
 
@@ -33,6 +43,14 @@ class MethodChannelAppsonairFlutterApplink
   @override
   Stream<Map<String, dynamic>?> initializeAppLink() {
     return eventChannel
+        .receiveBroadcastStream()
+        .map((event) => jsonDecode(event));
+  }
+
+  ///Provide the referral detail once app is launched after install for first time.
+  @override
+  Stream<Map<String, dynamic>?> onReferralLinkDetected() {
+    return appLinkReferralEventChanel
         .receiveBroadcastStream()
         .map((event) => jsonDecode(event));
   }

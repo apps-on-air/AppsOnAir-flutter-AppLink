@@ -29,6 +29,11 @@ class _MyAppState extends State<MyApp> {
         _linkDetails = event.toString(); // Update UI with deep link
       });
     });
+    _appsonairFlutterApplinkPlugin.onReferralLinkDetected().listen((event) {
+      setState(() {
+        _linkDetails = event.toString(); // Update UI with deep link
+      });
+    });
   }
 
   Future<void> createLink() async {
@@ -118,7 +123,7 @@ class _MyAppState extends State<MyApp> {
                   onPressed: () async {
                     try {
                       var data = await _appsonairFlutterApplinkPlugin
-                          .getReferralDetails();
+                          .getReferralInfo();
                       setState(() {
                         _linkDetails = data.toString();
                       });

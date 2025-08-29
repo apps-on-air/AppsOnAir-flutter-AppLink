@@ -156,14 +156,21 @@ await _appsonairFlutterApplinkPlugin.createAppLink(
 
 #### Listen the AppLink
 ```
-    _appsonairFlutterApplinkPlugin.initializeAppLink().listen((event) {
-      // Handle received link here...
-    });
+_appsonairFlutterApplinkPlugin.initializeAppLink().listen((event) {
+    // Handle received link here...
+});
+```
+#### Listen the Referral Details
+
+It is triggered only when the app is installed and launched for the first time with a referral details.
+
+```
+_appsonairFlutterApplinkPlugin.onReferralLinkDetected().listen((event) {
+    // Handle referral here...
+});
 ```
 
 #### To retrieving the referral link
 ```
-   // If you call getReferralDetails() immediately after  initialization, you may need to add a short delay to ensure the referral data is available.
-
-    var data = await _appsonairFlutterApplinkPlugin.getReferralDetails();
+var data = await _appsonairFlutterApplinkPlugin.getReferralInfo();
 ```
