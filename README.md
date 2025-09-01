@@ -22,7 +22,7 @@
 #### Provide your application id in your app info.plist file.
 
 ```sh
-<key>AppsOnAirAPIKey</key>
+<key>AppsonairAppId</key>
 <string>XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX</string>
 ```
 
@@ -87,7 +87,7 @@ allprojects {
 
 #### Add meta-data to the app's AndroidManifest.xml file under the application tag.
 
->Make sure meta-data name is “appId”.
+>Make sure meta-data name is “AppsonairAppId”.
 
 >Provide your application id in meta-data value.
 
@@ -96,7 +96,7 @@ allprojects {
 </application>
     ...
     <meta-data
-        android:name="appId"
+        android:name="AppsonairAppId"
         android:value="********-****-****-****-************" />
 </application>
 ```
