@@ -1,3 +1,7 @@
+## 1.2.2
+
+* iOS Dependency upgrade.
+
 ## 1.2.1
 
 * Dependencies upgrade and improvements.
