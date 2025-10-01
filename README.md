@@ -25,6 +25,12 @@
 <string>XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX</string>
 ```
 
+#### Enable the Advanced Deferred AppLink feature in your iOS app by adding the EnableAdvancedDeferredLink Boolean flag to your Info.plist file.
+```xml
+<key>EnableAdvancedDeferredLink</key>
+<true/>
+```
+
 #### Add Associated Domain
 
 ```

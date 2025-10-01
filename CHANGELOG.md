@@ -1,3 +1,7 @@
+## 1.2.3
+
+* Referral tracking enhancement.
+
 ## 1.2.2
 
 * iOS Dependency upgrade.
