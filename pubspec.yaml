@@ -1,6 +1,6 @@
 name: appsonair_flutter_applink
 description: The AppsOnAir AppLink Flutter SDK enables deep link tracking and engagement analytics for both iOS and Android. It serves as a powerful alternative to Firebase Dynamic Links.
-version: 1.2.3
+version: 1.2.4
 # homepage:
 repository: https://github.com/apps-on-air/AppsOnAir-flutter-AppLink
 
