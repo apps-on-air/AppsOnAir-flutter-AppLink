@@ -1,3 +1,7 @@
+## 1.2.4
+
+* Android Dependency upgrade.
+
 ## 1.2.3
 
 * Referral tracking enhancement.
