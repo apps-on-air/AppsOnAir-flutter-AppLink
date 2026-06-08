@@ -19,65 +19,147 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   String _linkDetails = '';
   final _appsonairFlutterApplinkPlugin = AppsonairFlutterApplink();
-  TextEditingController txtController = TextEditingController();
+
+  // Form Controllers
+  final TextEditingController _urlController = TextEditingController(text: 'https://appsonair.com');
+  final TextEditingController _nameController = TextEditingController(text: 'AppsOnAir');
+  final TextEditingController _urlPrefixController = TextEditingController(text: 'YOUR_DOMAIN_NAME');
+  final TextEditingController _shortIdController = TextEditingController();
+  final TextEditingController _titleController = TextEditingController(text: 'link title');
+  final TextEditingController _descriptionController = TextEditingController(text: 'link description');
+  final TextEditingController _imageUrlController = TextEditingController(text: 'https://image.png');
+  final TextEditingController _androidFallbackController = TextEditingController(text: 'https://play.google.com');
+  final TextEditingController _iosFallbackController = TextEditingController(text: 'https://appstore.com');
+
+  // Toggle States
+  bool _isOpenInAndroidApp = true;
+  bool _isOpenInBrowserAndroid = false;
+  bool _isOpenInIosApp = true;
+  bool _isOpenInBrowserApple = false;
 
   @override
   void initState() {
     super.initState();
     _appsonairFlutterApplinkPlugin.initializeAppLink().listen((event) {
       setState(() {
-        _linkDetails = event.toString(); // Update UI with deep link
+        _linkDetails = event.toString();
       });
     });
     _appsonairFlutterApplinkPlugin.onReferralLinkDetected().listen((event) {
       setState(() {
-        _linkDetails = event.toString(); // Update UI with deep link
+        _linkDetails = event.toString();
       });
     });
   }
 
+  @override
+  void dispose() {
+    _urlController.dispose();
+    _nameController.dispose();
+    _urlPrefixController.dispose();
+    _shortIdController.dispose();
+    _titleController.dispose();
+    _descriptionController.dispose();
+    _imageUrlController.dispose();
+    _androidFallbackController.dispose();
+    _iosFallbackController.dispose();
+    super.dispose();
+  }
+
   Future<void> createLink() async {
     String link;
-    String? shortId;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    // We also handle the message potentially returning null.
+    String? shortId = _shortIdController.text.trim().isEmpty ? null : _shortIdController.text.trim();
+
     try {
-      if (txtController.text.trim().isNotEmpty) {
-        shortId = txtController.text.trim();
-      }
       var data = await _appsonairFlutterApplinkPlugin.createAppLink(
         appLinkParams: AppLinkParams(
-          url: 'https://appsonair.com',
-          name: 'AppsOnAir',
-          urlPrefix: 'YOUR_DOMAIN_NAME', //shouldn't contain http or https
-          shortId: shortId, // If not set, it will be auto-generated
+          url: _urlController.text.trim(),
+          name: _nameController.text.trim(),
+          urlPrefix: _urlPrefixController.text.trim(),
+          shortId: shortId,
           socialMeta: SocialMeta(
-            title: 'link title',
-            description: 'link description',
-            imageUrl: 'https://image.png',
+            title: _titleController.text.trim(),
+            description: _descriptionController.text.trim(),
+            imageUrl: _imageUrlController.text.trim(),
           ),
-          androidFallbackUrl: 'https://play.google.com',
-          iosFallbackUrl: 'https://appstore.com',
-          isOpenInAndroidApp: true,
-          isOpenInBrowserAndroid: false,
-          isOpenInIosApp: true,
-          isOpenInBrowserApple: false,
+          androidFallbackUrl: _androidFallbackController.text.trim(),
+          iosFallbackUrl: _iosFallbackController.text.trim(),
+          isOpenInAndroidApp: _isOpenInAndroidApp,
+          isOpenInBrowserAndroid: _isOpenInBrowserAndroid,
+          isOpenInIosApp: _isOpenInIosApp,
+          isOpenInBrowserApple: _isOpenInBrowserApple,
         ),
       );
       link = data.toString();
-      txtController.clear();
     } on PlatformException {
       link = 'Failed to create link.';
     }
 
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
     if (!mounted) return;
 
     setState(() {
       _linkDetails = link;
     });
+  }
+
+  Future<void> getReferralInfo() async {
+    try {
+      var data = await _appsonairFlutterApplinkPlugin.getReferralInfo();
+      setState(() {
+        _linkDetails = data.toString();
+      });
+    } on PlatformException catch (e) {
+      log(e.toString());
+      setState(() {
+        _linkDetails = 'Failed to get referral info: ${e.message}';
+      });
+    }
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required String hint,
+    bool isMultiline = false,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      child: TextField(
+        controller: controller,
+        maxLines: isMultiline ? 2 : 1,
+        decoration: InputDecoration(
+          labelText: label,
+          hintText: hint,
+          border: const OutlineInputBorder(),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildToggle({
+    required String label,
+    required bool value,
+    required Function(bool) onChanged,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+          ),
+          Switch(
+            value: value,
+            onChanged: (newValue) => onChanged(newValue),
+            activeThumbColor: Colors.green,
+            inactiveThumbColor: Colors.grey,
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -88,60 +170,163 @@ class _MyAppState extends State<MyApp> {
           title: const Text('Flutter AppLink Example'),
           centerTitle: true,
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(12),
+        body: SingleChildScrollView(
           child: Column(
             children: [
-              const SizedBox(height: 40),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: TextField(
-                  controller: txtController,
-                  decoration: const InputDecoration(
-                      hintText: "Enter short link id if needed",
-                      border: OutlineInputBorder()),
+              const SizedBox(height: 16),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 12),
+                child: Text(
+                  'Basic Information',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
+              ),
+              const SizedBox(height: 8),
+              _buildTextField(
+                controller: _urlController,
+                label: 'URL',
+                hint: 'https://example.com',
+              ),
+              _buildTextField(
+                controller: _nameController,
+                label: 'Name',
+                hint: 'App Name',
+              ),
+              _buildTextField(
+                controller: _urlPrefixController,
+                label: 'URL Prefix',
+                hint: 'YOUR_DOMAIN_NAME (no http/https)',
+              ),
+              _buildTextField(
+                controller: _shortIdController,
+                label: 'Short ID',
+                hint: 'Leave empty for auto-generation',
               ),
               const SizedBox(height: 20),
-              Center(
-                child: TextButton(
-                  style: ButtonStyle(
-                      backgroundColor:
-                          WidgetStateProperty.all<Color>(Colors.greenAccent)),
-                  onPressed: () {
-                    createLink();
-                  },
-                  child: const Text("Create AppLink"),
-                ),
-              ),
-              const SizedBox(height: 10),
-              Center(
-                child: TextButton(
-                  style: ButtonStyle(
-                      backgroundColor:
-                          WidgetStateProperty.all<Color>(Colors.tealAccent)),
-                  onPressed: () async {
-                    try {
-                      var data = await _appsonairFlutterApplinkPlugin
-                          .getReferralInfo();
-                      setState(() {
-                        _linkDetails = data.toString();
-                      });
-                    } on PlatformException catch (e) {
-                      log(e.toString());
-                    }
-                  },
-                  child: const Text("Get Referral Link"),
-                ),
-              ),
-              const SizedBox(height: 40),
-              Flexible(
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 12),
                 child: Text(
-                  _linkDetails,
-                  textAlign: TextAlign.center,
+                  'Social Media',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ),
-              const SizedBox(height: 50)
+              const SizedBox(height: 8),
+              _buildTextField(
+                controller: _titleController,
+                label: 'Social Title',
+                hint: 'Title for social sharing',
+              ),
+              _buildTextField(
+                controller: _descriptionController,
+                label: 'Social Description',
+                hint: 'Description for social sharing',
+                isMultiline: true,
+              ),
+              _buildTextField(
+                controller: _imageUrlController,
+                label: 'Image URL',
+                hint: 'https://example.com/image.png',
+              ),
+              const SizedBox(height: 20),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 12),
+                child: Text(
+                  'Fallback URLs',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+              ),
+              const SizedBox(height: 8),
+              _buildTextField(
+                controller: _androidFallbackController,
+                label: 'Android Fallback URL',
+                hint: 'https://play.google.com/store/apps/...',
+              ),
+              _buildTextField(
+                controller: _iosFallbackController,
+                label: 'iOS Fallback URL',
+                hint: 'https://apps.apple.com/app/...',
+              ),
+              const SizedBox(height: 20),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 12),
+                child: Text(
+                  'Open Behavior',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+              ),
+              const SizedBox(height: 8),
+              _buildToggle(
+                label: 'Open in Android App',
+                value: _isOpenInAndroidApp,
+                onChanged: (value) => setState(() => _isOpenInAndroidApp = value),
+              ),
+              _buildToggle(
+                label: 'Open in Browser (Android)',
+                value: _isOpenInBrowserAndroid,
+                onChanged: (value) => setState(() => _isOpenInBrowserAndroid = value),
+              ),
+              _buildToggle(
+                label: 'Open in iOS App',
+                value: _isOpenInIosApp,
+                onChanged: (value) => setState(() => _isOpenInIosApp = value),
+              ),
+              _buildToggle(
+                label: 'Open in Browser (Apple)',
+                value: _isOpenInBrowserApple,
+                onChanged: (value) => setState(() => _isOpenInBrowserApple = value),
+              ),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: createLink,
+                    icon: const Icon(Icons.link),
+                    label: const Text('Create Link'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    ),
+                  ),
+                  ElevatedButton.icon(
+                    onPressed: getReferralInfo,
+                    icon: const Icon(Icons.info),
+                    label: const Text('Get Referral'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.teal,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              if (_linkDetails.isNotEmpty) ...[
+                const Divider(),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  child: Text(
+                    'Result',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                Container(
+                  margin: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(8),
+                    color: Colors.grey[100],
+                  ),
+                  child: SelectableText(
+                    _linkDetails,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                ),
+              ],
+              const SizedBox(height: 20),
             ],
           ),
         ),

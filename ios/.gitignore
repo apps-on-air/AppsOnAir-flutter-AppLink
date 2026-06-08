@@ -36,3 +36,11 @@ Icon?
 /Flutter/Generated.xcconfig
 /Flutter/ephemeral/
 /Flutter/flutter_export_environment.sh
+
+# CocoaPods
+Pods/
+Podfile.lock
+
+# SPM build artifacts
+.build/
+*.xcworkspace/
