@@ -1,3 +1,7 @@
+## 1.3.0
+
+* Added Swift Package Manager (SPM) support for iOS.
+
 ## 1.2.4
 
 * Android Dependency upgrade.

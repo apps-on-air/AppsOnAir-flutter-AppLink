@@ -20,7 +20,7 @@
 
 #### Provide your application id in your app info.plist file.
 
-```sh
+```xml
 <key>AppsonairAppId</key>
 <string>XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX</string>
 ```
@@ -33,7 +33,7 @@
 
 #### Add Associated Domain
 
-```
+```xml
 <!-- If Using Custom Url Schema -->
 <key>CFBundleURLTypes</key>
 <array>
@@ -48,7 +48,7 @@
 </array>
 ```
 
-```
+```xml
 <!-- If Using Universal Links -->
 <key>com.apple.developer.associated-domains</key>
 <array>
@@ -62,6 +62,73 @@
 - Kotlin: Version 1.7.10 or higher
 - Gradle: Version 8.0 or higher
 
+---
+
+### iOS Dependency Manager
+
+This plugin supports **both CocoaPods and Swift Package Manager (SPM)**. SPM support requires **Flutter 3.24.0 or higher**.
+
+By default, CocoaPods is used. You can control which dependency manager your project uses by adding the following to your app's `pubspec.yaml`:
+
+#### Option 1 — CocoaPods (default)
+
+Use this if you want to always use CocoaPods regardless of any global Flutter setting:
+
+```yaml
+# pubspec.yaml
+flutter:
+  config:
+    # false → always uses CocoaPods (default)
+    enable-swift-package-manager: false
+```
+
+No other steps needed. Run:
+
+```sh
+flutter pub get
+cd ios && pod install
+```
+
+#### Option 2 — Swift Package Manager
+
+> Requires **Flutter ≥ 3.24.0**. SPM support on iOS is available starting from this version.
+
+Use this to opt into SPM and use `AppsOnAir-iOS-AppLink` via Swift Package Manager:
+
+```yaml
+# pubspec.yaml
+flutter:
+  config:
+    # true → uses Swift Package Manager
+    enable-swift-package-manager: true
+```
+
+Then run:
+
+```sh
+flutter pub get
+```
+
+Flutter will automatically resolve `AppsOnAir-iOS-AppLink v1.4.0` via SPM. No additional Xcode configuration is required.
+
+> **Note:** You can also enable SPM globally for all your Flutter projects (instead of per-project) by running:
+> ```sh
+> flutter config --enable-swift-package-manager
+> ```
+> In that case, you can remove the `config` block from `pubspec.yaml` entirely and Flutter will use SPM automatically.
+
+#### Summary
+
+| `enable-swift-package-manager` | Flutter version | Result |
+|:---:|:---:|:---|
+| `false` | any | **CocoaPods** — used |
+| `true` | ≥ 3.24.0 | **SPM** — used |
+| not set | any (global off) | **CocoaPods** — default behaviour |
+| not set | ≥ 3.24.0 (global on) | **SPM** — Flutter global setting applies |
+
+> 💡 **Recommendation:** We recommend migrating to **Swift Package Manager** — it is Apple's official, actively maintained dependency manager and receives updates first.
+
+---
 
 ## How to use?
 
@@ -92,13 +159,13 @@ allprojects {
 
 #### Add meta-data to the app's AndroidManifest.xml file under the application tag.
 
->Make sure meta-data name is “AppsonairAppId”.
+>Make sure meta-data name is "AppsonairAppId".
 
 >Provide your application id in meta-data value.
 
 
-```sh
-</application>
+```xml
+<application>
     ...
     <meta-data
         android:name="AppsonairAppId"
@@ -108,26 +175,26 @@ allprojects {
 
 #### Add below code to the app's AndroidManifest.xml file under the activity tag of your main activity.
 
-```sh
- <intent-filter android:autoVerify="true">
-   <action android:name="android.intent.action.VIEW" />
-   <category android:name="android.intent.category.DEFAULT" />
-   <category android:name="android.intent.category.BROWSABLE" />
-    <data
-     android:host="your domain"
-     android:scheme="https" />
- </intent-filter>
+```xml
+<intent-filter android:autoVerify="true">
+  <action android:name="android.intent.action.VIEW" />
+  <category android:name="android.intent.category.DEFAULT" />
+  <category android:name="android.intent.category.BROWSABLE" />
+  <data
+    android:host="your domain"
+    android:scheme="https" />
+</intent-filter>
 ```
 
 #### Add below code if you are using custom uri scheme.
-```sh
- <intent-filter>
-    <action android:name="android.intent.action.VIEW" />
-    <category android:name="android.intent.category.DEFAULT" />
-    <category android:name="android.intent.category.BROWSABLE" />
-    <data
-     android:host="open"
-     android:scheme="your scheme" />
+```xml
+<intent-filter>
+   <action android:name="android.intent.action.VIEW" />
+   <category android:name="android.intent.category.DEFAULT" />
+   <category android:name="android.intent.category.BROWSABLE" />
+   <data
+    android:host="open"
+    android:scheme="your scheme" />
 </intent-filter>
 ```
 
@@ -136,7 +203,7 @@ allprojects {
 
 #### Create AppLink Method
 
-```
+```dart
 final _appsonairFlutterApplinkPlugin = AppsonairFlutterApplink();
 await _appsonairFlutterApplinkPlugin.createAppLink(
         appLinkParams: AppLinkParams(
@@ -160,7 +227,7 @@ await _appsonairFlutterApplinkPlugin.createAppLink(
 ```
 
 #### Listen the AppLink
-```
+```dart
 _appsonairFlutterApplinkPlugin.initializeAppLink().listen((event) {
     // Handle received link here...
 });
@@ -169,13 +236,13 @@ _appsonairFlutterApplinkPlugin.initializeAppLink().listen((event) {
 
 It is triggered only when the app is installed and launched for the first time with a referral details.
 
-```
+```dart
 _appsonairFlutterApplinkPlugin.onReferralLinkDetected().listen((event) {
     // Handle referral here...
 });
 ```
 
 #### To retrieving the referral link
-```
+```dart
 var data = await _appsonairFlutterApplinkPlugin.getReferralInfo();
 ```

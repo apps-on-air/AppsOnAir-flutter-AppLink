@@ -48,7 +48,27 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
-
+  # config: holds project-level Flutter feature flags that override global
+  # `flutter config` settings. Options set here apply only to this project.
+  # config:
+    # ─── Swift Package Manager (SPM) Toggle ───────────────────────────────────
+    #
+    # GLOBAL LEVEL  (applies to all Flutter projects on your machine)
+    # ──────────────────────────────────────────────────────────────
+    #   Enable  → flutter config --enable-swift-package-manager
+    #   Disable → flutter config --no-enable-swift-package-manager
+    #   Check   → flutter config
+    #
+    # PROJECT LEVEL  (overrides the global setting for this project only)
+    # ──────────────────────────────────────────────────────────────────
+    #   Enable  → uncomment the line below and set it to: true
+    #   Disable → uncomment the line below and set it to: false
+    #             (this also overrides a globally enabled SPM setting)
+    #   Default → keep the line commented out to inherit the global setting
+    #
+    # ─────────────────────────────────────────────────────────────────────────
+    # enable-swift-package-manager: true
+    
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
