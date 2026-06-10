@@ -21,15 +21,23 @@ class _MyAppState extends State<MyApp> {
   final _appsonairFlutterApplinkPlugin = AppsonairFlutterApplink();
 
   // Form Controllers
-  final TextEditingController _urlController = TextEditingController(text: 'https://appsonair.com');
-  final TextEditingController _nameController = TextEditingController(text: 'AppsOnAir');
-  final TextEditingController _urlPrefixController = TextEditingController(text: 'YOUR_DOMAIN_NAME');
+  final TextEditingController _urlController =
+      TextEditingController(text: 'https://appsonair.com');
+  final TextEditingController _nameController =
+      TextEditingController(text: 'AppsOnAir');
+  final TextEditingController _urlPrefixController =
+      TextEditingController(text: 'YOUR_DOMAIN_NAME');
   final TextEditingController _shortIdController = TextEditingController();
-  final TextEditingController _titleController = TextEditingController(text: 'link title');
-  final TextEditingController _descriptionController = TextEditingController(text: 'link description');
-  final TextEditingController _imageUrlController = TextEditingController(text: 'https://image.png');
-  final TextEditingController _androidFallbackController = TextEditingController(text: 'https://play.google.com');
-  final TextEditingController _iosFallbackController = TextEditingController(text: 'https://appstore.com');
+  final TextEditingController _titleController =
+      TextEditingController(text: 'link title');
+  final TextEditingController _descriptionController =
+      TextEditingController(text: 'link description');
+  final TextEditingController _imageUrlController =
+      TextEditingController(text: 'https://image.png');
+  final TextEditingController _androidFallbackController =
+      TextEditingController(text: 'https://play.google.com');
+  final TextEditingController _iosFallbackController =
+      TextEditingController(text: 'https://appstore.com');
 
   // Toggle States
   bool _isOpenInAndroidApp = true;
@@ -68,7 +76,9 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> createLink() async {
     String link;
-    String? shortId = _shortIdController.text.trim().isEmpty ? null : _shortIdController.text.trim();
+    String? shortId = _shortIdController.text.trim().isEmpty
+        ? null
+        : _shortIdController.text.trim();
 
     try {
       var data = await _appsonairFlutterApplinkPlugin.createAppLink(
@@ -131,7 +141,8 @@ class _MyAppState extends State<MyApp> {
           labelText: label,
           hintText: hint,
           border: const OutlineInputBorder(),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         ),
       ),
     );
@@ -154,7 +165,7 @@ class _MyAppState extends State<MyApp> {
           Switch(
             value: value,
             onChanged: (newValue) => onChanged(newValue),
-            activeThumbColor: Colors.green,
+            activeColor: Colors.green,
             inactiveThumbColor: Colors.grey,
           ),
         ],
@@ -258,12 +269,14 @@ class _MyAppState extends State<MyApp> {
               _buildToggle(
                 label: 'Open in Android App',
                 value: _isOpenInAndroidApp,
-                onChanged: (value) => setState(() => _isOpenInAndroidApp = value),
+                onChanged: (value) =>
+                    setState(() => _isOpenInAndroidApp = value),
               ),
               _buildToggle(
                 label: 'Open in Browser (Android)',
                 value: _isOpenInBrowserAndroid,
-                onChanged: (value) => setState(() => _isOpenInBrowserAndroid = value),
+                onChanged: (value) =>
+                    setState(() => _isOpenInBrowserAndroid = value),
               ),
               _buildToggle(
                 label: 'Open in iOS App',
@@ -273,7 +286,8 @@ class _MyAppState extends State<MyApp> {
               _buildToggle(
                 label: 'Open in Browser (Apple)',
                 value: _isOpenInBrowserApple,
-                onChanged: (value) => setState(() => _isOpenInBrowserApple = value),
+                onChanged: (value) =>
+                    setState(() => _isOpenInBrowserApple = value),
               ),
               const SizedBox(height: 24),
               Row(
@@ -286,7 +300,8 @@ class _MyAppState extends State<MyApp> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 12),
                     ),
                   ),
                   ElevatedButton.icon(
@@ -296,7 +311,8 @@ class _MyAppState extends State<MyApp> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.teal,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 12),
                     ),
                   ),
                 ],
