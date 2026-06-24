@@ -1,3 +1,7 @@
+## 1.3.1
+
+* Dependencies upgrade and improvements.
+
 ## 1.3.0
 
 * Added Swift Package Manager (SPM) support for iOS.
