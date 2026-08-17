@@ -37,6 +37,13 @@ class AppLinkParams {
   /// Indicates whether the link should attempt to open in the iOS app.
   final bool? isOpenInIosApp;
 
+  /// Optional AppsFlyer attribution params (e.g., channel, campaignId,
+  /// campaign, subs, metaTitle, metaDescription).
+  final Map<String, dynamic>? appsFlyer;
+
+  /// Optional time-to-live, in seconds, for attribution of this link.
+  final int? attributionTtl;
+
   /// Creates an [AppLinkParams] instance with the required and optional fields.
   AppLinkParams({
     required this.url,
@@ -50,6 +57,8 @@ class AppLinkParams {
     this.isOpenInAndroidApp,
     this.isOpenInBrowserApple,
     this.isOpenInIosApp,
+    this.appsFlyer,
+    this.attributionTtl,
   });
 
   /// Creates an [AppLinkParams] instance from a JSON [Map].
@@ -71,6 +80,8 @@ class AppLinkParams {
       isOpenInIosApp: json['isOpenInIosApp'],
       androidFallbackUrl: json['androidFallbackUrl'],
       iosFallbackUrl: json['iosFallbackUrl'],
+      appsFlyer: json['appsFlyer'],
+      attributionTtl: json['attributionTtl'],
     );
   }
 
@@ -93,6 +104,12 @@ class AppLinkParams {
     data['isOpenInAndroidApp'] = isOpenInAndroidApp;
     data['androidFallbackUrl'] = androidFallbackUrl;
     data['iosFallbackUrl'] = iosFallbackUrl;
+    if (appsFlyer != null) {
+      data['appsFlyer'] = appsFlyer;
+    }
+    if (attributionTtl != null) {
+      data['attributionTtl'] = attributionTtl;
+    }
     return data;
   }
 }

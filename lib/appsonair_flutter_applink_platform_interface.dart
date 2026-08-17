@@ -26,14 +26,21 @@ abstract class AppsonairFlutterApplinkPlatform extends PlatformInterface {
   }
 
   ///Returns the referral details for app install
-  @Deprecated('Use getReferralInfo() instead')
+  @Deprecated('Use getAttributionInfo() instead')
   Future<Map<String, dynamic>?> getReferralDetails() {
     throw UnimplementedError('platformVersion() has not been implemented.');
   }
 
   ///Return the referral link which user click for installing the application
   ///It will wait till untill referral data reflected
+  @Deprecated('Use getAttributionInfo() instead')
   Future<Map<String, dynamic>?> getReferralInfo() {
+    throw UnimplementedError('platformVersion() has not been implemented.');
+  }
+
+  ///Return the attribution info for the app install, including first-launch
+  ///and attribution status details.
+  Future<Map<String, dynamic>?> getAttributionInfo() {
     throw UnimplementedError('platformVersion() has not been implemented.');
   }
 
@@ -49,7 +56,14 @@ abstract class AppsonairFlutterApplinkPlatform extends PlatformInterface {
   }
 
   ///Initialize the applink service
+  @Deprecated('Use onAttributionListener() instead')
   Stream<Map<String, dynamic>?> onReferralLinkDetected() {
+    throw UnimplementedError('platformVersion() has not been implemented.');
+  }
+
+  ///Provide the attribution detail once app is launched after install for
+  ///first time.
+  Stream<Map<String, dynamic>?> onAttributionListener() {
     throw UnimplementedError('platformVersion() has not been implemented.');
   }
 }

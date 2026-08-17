@@ -8,6 +8,7 @@
 - ✅ Fallback behavior (e.g., open Play Store, App Store)
 - ✅ Custom domain support
 - ✅ Referral tracking
+- ✅ Attribution tracking (with AppsFlyer support)
 - ✅ Seamless migration from Firebase Dynamic Links to AppLink
 
 **Note:** For comprehensive instructions on migrating Firebase Dynamic Links to AppLink, refer to the [documentation](https://documentation.appsonair.com/MobileQuickstart/AppLink/firebase-dynamiclinks-migration).
@@ -222,6 +223,15 @@ await _appsonairFlutterApplinkPlugin.createAppLink(
           isOpenInBrowserAndroid: false,
           isOpenInIosApp: true,
           isOpenInBrowserApple: false,
+          appsFlyer: { // Optional: AppsFlyer attribution params
+            'channel': 'appsonair',
+            'campaignId': '01',
+            'campaign': 'test',
+            'subs': ['sub1', 'sub2', 'sub3', 'sub4', 'sub5'],
+            'metaTitle': 'metaTitle',
+            'metaDescription': 'metaDescription',
+          },
+          attributionTtl: 3600, // Time-to-live for attribution, in seconds (minimum 3600 = 1 hour)
         ),
       );
 ```
@@ -232,7 +242,26 @@ _appsonairFlutterApplinkPlugin.initializeAppLink().listen((event) {
     // Handle received link here...
 });
 ```
-#### Listen the Referral Details
+
+#### To retrieving the attribution info
+It returns the attribution info for the app install, including first-launch and attribution status details. It waits until the attribution data is reflected.
+```dart
+var data = await _appsonairFlutterApplinkPlugin.getAttributionInfo();
+```
+
+#### Listen the Attribution Details
+
+It is triggered only when the app is installed and launched for the first time with attribution details.
+
+```dart
+_appsonairFlutterApplinkPlugin.onAttributionListener().listen((event) {
+    // Handle attribution here...
+});
+```
+
+#### Listen the Referral Details (Deprecated)
+
+> ⚠️ Deprecated: use [`onAttributionListener()`](#listen-the-attribution-details) instead.
 
 It is triggered only when the app is installed and launched for the first time with a referral details.
 
@@ -242,7 +271,20 @@ _appsonairFlutterApplinkPlugin.onReferralLinkDetected().listen((event) {
 });
 ```
 
-#### To retrieving the referral link
+#### To retrieving the referral details (Deprecated)
+
+> ⚠️ Deprecated: use [`getAttributionInfo()`](#to-retrieving-the-attribution-info) instead.
+
+```dart
+var data = await _appsonairFlutterApplinkPlugin.getReferralDetails();
+```
+
+#### To retrieving the referral info (Deprecated)
+
+> ⚠️ Deprecated: use [`getAttributionInfo()`](#to-retrieving-the-attribution-info) instead.
+
+It waits until the referral data is reflected.
+
 ```dart
 var data = await _appsonairFlutterApplinkPlugin.getReferralInfo();
 ```
