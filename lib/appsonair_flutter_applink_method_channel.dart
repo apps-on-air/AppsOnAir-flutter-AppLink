@@ -14,6 +14,8 @@ class MethodChannelAppsonairFlutterApplink
   final eventChannel = const EventChannel('appLinkEventChanel');
   final appLinkReferralEventChanel =
       const EventChannel('appLinkReferralEventChanel');
+  final appLinkAttributionEventChanel =
+      const EventChannel('appLinkAttributionEventChanel');
 
   ///Pass the AppLinkParams data to native api and provide the response received from native api to flutter
   @override
@@ -39,6 +41,14 @@ class MethodChannelAppsonairFlutterApplink
     return jsonDecode(response);
   }
 
+  ///Provides referral/attribution data received from native api to flutter
+  @override
+  Future<Map<String, dynamic>?> getAttributionInfo() async {
+    final response =
+        await methodChannel.invokeMethod('get_attribution_info');
+    return jsonDecode(response);
+  }
+
   ///Initialize the applink service in your application for link tracking and deeplinking
   @override
   Stream<Map<String, dynamic>?> initializeAppLink() {
@@ -51,6 +61,15 @@ class MethodChannelAppsonairFlutterApplink
   @override
   Stream<Map<String, dynamic>?> onReferralLinkDetected() {
     return appLinkReferralEventChanel
+        .receiveBroadcastStream()
+        .map((event) => jsonDecode(event));
+  }
+
+  ///Fires when an attribution is detected, and again every time the app
+  ///returns to the foreground so the payload stays current.
+  @override
+  Stream<Map<String, dynamic>?> onAttributionListener() {
+    return appLinkAttributionEventChanel
         .receiveBroadcastStream()
         .map((event) => jsonDecode(event));
   }

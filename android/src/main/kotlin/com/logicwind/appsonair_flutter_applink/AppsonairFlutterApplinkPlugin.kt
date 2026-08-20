@@ -26,8 +26,18 @@ class AppsonairFlutterApplinkPlugin: FlutterPlugin, MethodCallHandler, ActivityA
   private lateinit var eventChannel: EventChannel
   private lateinit var referralEventChannel: EventChannel
   private var eventSink: EventChannel.EventSink? = null
+  private lateinit var attributionEventChannel: EventChannel
   private var referralEventSink: EventChannel.EventSink? = null
+  private var attributionEventSink: EventChannel.EventSink? = null
   private var activity: Activity? = null
+
+  // initialize() runs from onAttachedToActivity, which can fire before Dart's initState() has
+  // subscribed to these EventChannels. A callback that arrives before onListen would otherwise be
+  // dropped silently (eventSink?.success() on a null sink is a no-op) even though native logs show
+  // it fired. Buffer the latest payload per channel and flush it once a listener attaches.
+  private var pendingDeepLink: String? = null
+  private var pendingReferralInfo: String? = null
+  private var pendingAttributionInfo: String? = null
 
   override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
     channel = MethodChannel(flutterPluginBinding.binaryMessenger, "appsOnAirAppLink")
@@ -35,9 +45,15 @@ class AppsonairFlutterApplinkPlugin: FlutterPlugin, MethodCallHandler, ActivityA
 
     eventChannel = EventChannel(flutterPluginBinding.binaryMessenger, "appLinkEventChanel")
     referralEventChannel = EventChannel(flutterPluginBinding.binaryMessenger, "appLinkReferralEventChanel")
+    attributionEventChannel = EventChannel(flutterPluginBinding.binaryMessenger, "appLinkAttributionEventChanel")
+
     eventChannel.setStreamHandler(object : EventChannel.StreamHandler {
       override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
         eventSink = events
+        pendingDeepLink?.let {
+          events?.success(it)
+          pendingDeepLink = null
+        }
       }
 
       override fun onCancel(arguments: Any?) {
@@ -47,10 +63,27 @@ class AppsonairFlutterApplinkPlugin: FlutterPlugin, MethodCallHandler, ActivityA
     referralEventChannel.setStreamHandler(object : EventChannel.StreamHandler {
       override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
         referralEventSink = events
+        pendingReferralInfo?.let {
+          events?.success(it)
+          pendingReferralInfo = null
+        }
       }
 
       override fun onCancel(arguments: Any?) {
         referralEventSink = null
+      }
+    })
+    attributionEventChannel.setStreamHandler(object : EventChannel.StreamHandler {
+      override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
+        attributionEventSink = events
+        pendingAttributionInfo?.let {
+          events?.success(it)
+          pendingAttributionInfo = null
+        }
+      }
+
+      override fun onCancel(arguments: Any?) {
+        attributionEventSink = null
       }
     })
   }
@@ -68,6 +101,8 @@ class AppsonairFlutterApplinkPlugin: FlutterPlugin, MethodCallHandler, ActivityA
     val isOpenInAndroidApp: Boolean? = call.argument<Boolean>("isOpenInAndroidApp") ?: null
     val isOpenInBrowserApple: Boolean? = call.argument<Boolean>("isOpenInBrowserApple") ?: null
     val isOpenInIosApp: Boolean? = call.argument<Boolean>("isOpenInIosApp") ?: null
+    val appsFlyer: Map<String, Any>? = call.argument<Map<String, Any>>("appsFlyer") ?: null
+    val attributionTtl: Int? = call.argument<Int>("attributionTtl") ?: null
 
     CoroutineScope(Dispatchers.Main).launch {
       val data = appLinkService?.createAppLink(
@@ -81,7 +116,9 @@ class AppsonairFlutterApplinkPlugin: FlutterPlugin, MethodCallHandler, ActivityA
           isOpenInAndroidApp = isOpenInAndroidApp,
           isOpenInBrowserAndroid = isOpenInBrowserAndroid,
           isOpenInBrowserApple = isOpenInBrowserApple,
-          isOpenInIosApp = isOpenInIosApp
+          isOpenInIosApp = isOpenInIosApp,
+          appsFlyer = appsFlyer,
+          attributionTtl = attributionTtl
       )
       result.success(data.toString())
     }
@@ -104,6 +141,13 @@ class AppsonairFlutterApplinkPlugin: FlutterPlugin, MethodCallHandler, ActivityA
           result.success(referral.toString())
          }
        }
+      "get_attribution_info" -> {
+        val appLinkService = activity?.let { AppLinkService.getInstance(it.applicationContext) }
+        CoroutineScope(Dispatchers.Main).launch {
+          val attributionInfo = appLinkService?.getAttributionInfo()
+          result.success(attributionInfo.toString())
+         }
+       }
         else -> {
           result.notImplemented()
         }
@@ -114,14 +158,15 @@ class AppsonairFlutterApplinkPlugin: FlutterPlugin, MethodCallHandler, ActivityA
     channel.setMethodCallHandler(null)
     eventSink = null
     referralEventSink = null
+    attributionEventSink = null
   }
 
   // Handle activity attachment and detachment
   override fun onAttachedToActivity(binding: ActivityPluginBinding) {
     activity = binding.activity
-    handleIntent(activity?.intent)
+    initializeAppLinkService(activity?.intent)
     binding.addOnNewIntentListener { intent ->
-      handleIntent(intent)
+      handleNewIntent(intent)
       true
     }
   }
@@ -138,31 +183,63 @@ class AppsonairFlutterApplinkPlugin: FlutterPlugin, MethodCallHandler, ActivityA
     activity = null
   }
 
-  // Handle deep links from intents
-  private fun handleIntent(intent: Intent?) {
-    val appLinkService = AppLinkService.getInstance(activity ?: return)
-
-    if (intent != null) {
-      appLinkService.initialize(activity ?: return,intent, object : AppLinkListener {
-        override fun onDeepLinkProcessed(uri: Uri, result: JSONObject) {
-          val mapData= mapOf(
-            "uri" to uri.toString(),
-            "result" to result,
-            )
-          eventSink?.success(JSONObject(mapData).toString())
-        }
-
-        override fun onReferralLinkDetected( result: JSONObject) {
-          referralEventSink?.success(result.toString())
-        }
-
-        override fun onDeepLinkError(uri: Uri?, error: String) {
-          Log.e("DeepLinkListener", "Failed to process deep link: $uri")
-          Log.e("DeepLinkListener", "Error: $error")
-        }
-
-      })
+  private val appLinkListener = object : AppLinkListener {
+    override fun onDeepLinkProcessed(uri: Uri, result: JSONObject) {
+      val mapData = mapOf(
+        "uri" to uri.toString(),
+        "result" to result,
+      )
+      val payload = JSONObject(mapData).toString()
+      val sink = eventSink
+      if (sink != null) {
+        sink.success(payload)
+      } else {
+        pendingDeepLink = payload
+      }
     }
+
+    override fun onReferralLinkDetected(result: JSONObject) {
+      val payload = result.toString()
+      val sink = referralEventSink
+      if (sink != null) {
+        sink.success(payload)
+      } else {
+        pendingReferralInfo = payload
+      }
+    }
+
+    override fun onAttributionListener(result: JSONObject) {
+      val payload = result.toString()
+      val sink = attributionEventSink
+      if (sink != null) {
+        sink.success(payload)
+      } else {
+        pendingAttributionInfo = payload
+      }
+    }
+
+    override fun onDeepLinkError(uri: Uri?, error: String) {
+      Log.e("DeepLinkListener", "Failed to process deep link: $uri")
+      Log.e("DeepLinkListener", "Error: $error")
+    }
+  }
+
+  // One-time setup: registers the listener and processes the launch intent (if any). Per the SDK,
+  // initialize() is idempotent and only processes the deep link on its first call — a later intent
+  // arriving while the app is already running must go through handleDeepLink() instead, not another
+  // initialize() call, otherwise it is silently dropped.
+  private fun initializeAppLinkService(intent: Intent?) {
+    val activity = activity ?: return
+    val appLinkService = AppLinkService.getInstance(activity)
+    appLinkService.initialize(activity, intent ?: Intent(), appLinkListener)
+  }
+
+  // Handle a deep link delivered to an already-running activity.
+  private fun handleNewIntent(intent: Intent?) {
+    val activity = activity ?: return
+    if (intent == null) return
+    val appLinkService = AppLinkService.getInstance(activity)
+    appLinkService.handleDeepLink(intent, activity.packageName)
   }
 }
 
