@@ -1,3 +1,20 @@
+## 2.0.0
+
+* `getReferralInfo()` is now deprecated, use `getAttributionInfo()` instead.
+
+* Introduced `getAttributionInfo()` method.
+    * Returns the same data as `getReferralInfo()` with additional `isFirstLaunch`, `firstInstallTime`, `isConsumed` and `attributionStatus` fields included in the response.
+
+* Introduced `onAttributionListener()` listener.
+    * When an attribution is detected, and again every time the app returns to the foreground so the payload stays current.
+
+* Added `appsFlyer` and `attributionTtl` params to `AppLinkParams` for AppsFlyer attribution support in `createAppLink` method.
+
+**Deprecated:**
+
+* `onReferralLinkDetected()` — use `onAttributionListener()`.
+* `getReferralInfo()` and `getReferralDetails()` — use `getAttributionInfo()`.
+
 ## 1.3.1
 
 * Dependencies upgrade and improvements.

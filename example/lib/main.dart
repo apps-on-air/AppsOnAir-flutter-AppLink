@@ -18,6 +18,8 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   String _linkDetails = '';
+  String _attributionDetails = '';
+  String _referralDetails = '';
   final _appsonairFlutterApplinkPlugin = AppsonairFlutterApplink();
 
   // Form Controllers
@@ -39,6 +41,22 @@ class _MyAppState extends State<MyApp> {
   final TextEditingController _iosFallbackController =
       TextEditingController(text: 'https://appstore.com');
 
+  // AppsFlyer Attribution Controllers
+  final TextEditingController _appsFlyerChannelController =
+      TextEditingController(text: 'appsonair');
+  final TextEditingController _appsFlyerCampaignIdController =
+      TextEditingController(text: '01');
+  final TextEditingController _appsFlyerCampaignController =
+      TextEditingController(text: 'test');
+  final TextEditingController _appsFlyerSubsController =
+      TextEditingController();
+  final TextEditingController _appsFlyerMetaTitleController =
+      TextEditingController();
+  final TextEditingController _appsFlyerMetaDescriptionController =
+      TextEditingController();
+  final TextEditingController _attributionTtlController =
+      TextEditingController(text: '3600');
+
   // Toggle States
   bool _isOpenInAndroidApp = true;
   bool _isOpenInBrowserAndroid = false;
@@ -55,7 +73,12 @@ class _MyAppState extends State<MyApp> {
     });
     _appsonairFlutterApplinkPlugin.onReferralLinkDetected().listen((event) {
       setState(() {
-        _linkDetails = event.toString();
+        _referralDetails = event.toString();
+      });
+    });
+    _appsonairFlutterApplinkPlugin.onAttributionListener().listen((event) {
+      setState(() {
+        _attributionDetails = event.toString();
       });
     });
   }
@@ -71,7 +94,38 @@ class _MyAppState extends State<MyApp> {
     _imageUrlController.dispose();
     _androidFallbackController.dispose();
     _iosFallbackController.dispose();
+    _appsFlyerChannelController.dispose();
+    _appsFlyerCampaignIdController.dispose();
+    _appsFlyerCampaignController.dispose();
+    _appsFlyerSubsController.dispose();
+    _appsFlyerMetaTitleController.dispose();
+    _appsFlyerMetaDescriptionController.dispose();
+    _attributionTtlController.dispose();
     super.dispose();
+  }
+
+  Map<String, dynamic>? _buildAppsFlyerParams() {
+    final channel = _appsFlyerChannelController.text.trim();
+    final campaignId = _appsFlyerCampaignIdController.text.trim();
+    final campaign = _appsFlyerCampaignController.text.trim();
+    final subs = _appsFlyerSubsController.text
+        .split(',')
+        .map((sub) => sub.trim())
+        .where((sub) => sub.isNotEmpty)
+        .toList();
+    final metaTitle = _appsFlyerMetaTitleController.text.trim();
+    final metaDescription = _appsFlyerMetaDescriptionController.text.trim();
+
+    final appsFlyer = <String, dynamic>{
+      if (channel.isNotEmpty) 'channel': channel,
+      if (campaignId.isNotEmpty) 'campaignId': campaignId,
+      if (campaign.isNotEmpty) 'campaign': campaign,
+      if (subs.isNotEmpty) 'subs': subs,
+      if (metaTitle.isNotEmpty) 'metaTitle': metaTitle,
+      if (metaDescription.isNotEmpty) 'metaDescription': metaDescription,
+    };
+
+    return appsFlyer.isEmpty ? null : appsFlyer;
   }
 
   Future<void> createLink() async {
@@ -98,6 +152,8 @@ class _MyAppState extends State<MyApp> {
           isOpenInBrowserAndroid: _isOpenInBrowserAndroid,
           isOpenInIosApp: _isOpenInIosApp,
           isOpenInBrowserApple: _isOpenInBrowserApple,
+          appsFlyer: _buildAppsFlyerParams(),
+          attributionTtl: int.tryParse(_attributionTtlController.text.trim()),
         ),
       );
       link = data.toString();
@@ -112,16 +168,16 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  Future<void> getReferralInfo() async {
+  Future<void> getAttributionInfo() async {
     try {
-      var data = await _appsonairFlutterApplinkPlugin.getReferralInfo();
+      var data = await _appsonairFlutterApplinkPlugin.getAttributionInfo();
       setState(() {
-        _linkDetails = data.toString();
+        _attributionDetails = data.toString();
       });
     } on PlatformException catch (e) {
       log(e.toString());
       setState(() {
-        _linkDetails = 'Failed to get referral info: ${e.message}';
+        _attributionDetails = 'Failed to get attribution info: ${e.message}';
       });
     }
   }
@@ -165,7 +221,7 @@ class _MyAppState extends State<MyApp> {
           Switch(
             value: value,
             onChanged: (newValue) => onChanged(newValue),
-            activeColor: Colors.green,
+            activeThumbColor: Colors.green,
             inactiveThumbColor: Colors.grey,
           ),
         ],
@@ -261,6 +317,51 @@ class _MyAppState extends State<MyApp> {
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 12),
                 child: Text(
+                  'AppsFlyer Attribution',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+              ),
+              const SizedBox(height: 8),
+              _buildTextField(
+                controller: _appsFlyerChannelController,
+                label: 'Channel',
+                hint: 'e.g. appsonair',
+              ),
+              _buildTextField(
+                controller: _appsFlyerCampaignIdController,
+                label: 'Campaign ID',
+                hint: 'Unique campaign identifier',
+              ),
+              _buildTextField(
+                controller: _appsFlyerCampaignController,
+                label: 'Campaign',
+                hint: 'Human-readable campaign name',
+              ),
+              _buildTextField(
+                controller: _appsFlyerSubsController,
+                label: 'Subs',
+                hint: 'Comma-separated, e.g. sub1, sub2, sub3',
+              ),
+              _buildTextField(
+                controller: _appsFlyerMetaTitleController,
+                label: 'Meta Title',
+                hint: 'Title used for attribution metadata',
+              ),
+              _buildTextField(
+                controller: _appsFlyerMetaDescriptionController,
+                label: 'Meta Description',
+                hint: 'Description used for attribution metadata',
+                isMultiline: true,
+              ),
+              _buildTextField(
+                controller: _attributionTtlController,
+                label: 'Attribution TTL (seconds)',
+                hint: 'Minimum 3600 (1 hour)',
+              ),
+              const SizedBox(height: 20),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 12),
+                child: Text(
                   'Open Behavior',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
@@ -290,35 +391,42 @@ class _MyAppState extends State<MyApp> {
                     setState(() => _isOpenInBrowserApple = value),
               ),
               const SizedBox(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ElevatedButton.icon(
-                    onPressed: createLink,
-                    icon: const Icon(Icons.link),
-                    label: const Text('Create Link'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 12),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 12,
+                  runSpacing: 12,
+                  children: [
+                    ElevatedButton.icon(
+                      onPressed: createLink,
+                      icon: const Icon(Icons.link),
+                      label: const Text('Create Link'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 12),
+                      ),
                     ),
-                  ),
-                  ElevatedButton.icon(
-                    onPressed: getReferralInfo,
-                    icon: const Icon(Icons.info),
-                    label: const Text('Get Referral'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.teal,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 12),
+                    ElevatedButton.icon(
+                      onPressed: getAttributionInfo,
+                      icon: const Icon(Icons.insights),
+                      label: const Text('Get Attribution'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.deepPurple,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 12),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               const SizedBox(height: 24),
-              if (_linkDetails.isNotEmpty) ...[
+              if (_linkDetails.isNotEmpty ||
+                  _attributionDetails.isNotEmpty ||
+                  _referralDetails.isNotEmpty) ...[
                 const Divider(),
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -327,6 +435,7 @@ class _MyAppState extends State<MyApp> {
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ),
+                const SelectableText("Link Info (initializeAppLink)"),
                 Container(
                   margin: const EdgeInsets.all(12),
                   padding: const EdgeInsets.all(12),
@@ -337,6 +446,38 @@ class _MyAppState extends State<MyApp> {
                   ),
                   child: SelectableText(
                     _linkDetails,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                ),
+                const SelectableText(
+                    "Referral Details (onReferralLinkDetected)"),
+                Container(
+                  margin: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(8),
+                    color: Colors.grey[100],
+                  ),
+                  child: SelectableText(
+                    _referralDetails,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                ),
+                const SelectableText(
+                    "Attribution Info (onAttributionListener)"),
+                Container(
+                  margin: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(8),
+                    color: Colors.grey[100],
+                  ),
+                  child: SelectableText(
+                    _attributionDetails,
                     textAlign: TextAlign.center,
                     style: const TextStyle(fontSize: 12),
                   ),

@@ -10,7 +10,7 @@ let package = Package(
         .library(name: "appsonair-flutter-applink", targets: ["appsonair_flutter_applink"])
     ],
     dependencies: [
-        .package(url: "https://github.com/apps-on-air/AppsOnAir-iOS-AppLink.git", exact: "1.4.1")
+        .package(url: "https://github.com/apps-on-air/AppsOnAir-iOS-AppLink.git", exact: "2.0.0")
     ],
     targets: [
         .target(
