@@ -22,7 +22,7 @@ class AppsonairFlutterApplink {
     return await AppsonairFlutterApplinkPlatform.instance.getReferralInfo();
   }
 
-  ///Return the referral/attribution info: same as [getReferralInfo]
+  ///Return the referral/attribution info
   Future<Map<String, dynamic>?> getAttributionInfo() async {
     return await AppsonairFlutterApplinkPlatform.instance.getAttributionInfo();
   }

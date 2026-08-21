@@ -44,8 +44,7 @@ class MethodChannelAppsonairFlutterApplink
   ///Provides referral/attribution data received from native api to flutter
   @override
   Future<Map<String, dynamic>?> getAttributionInfo() async {
-    final response =
-        await methodChannel.invokeMethod('get_attribution_info');
+    final response = await methodChannel.invokeMethod('get_attribution_info');
     return jsonDecode(response);
   }
 
