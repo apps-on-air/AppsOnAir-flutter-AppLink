@@ -25,12 +25,15 @@ if (flutterVersionName == null) {
 
 android {
     namespace = "com.logicwind.appsonair_flutter_applink_example"
-    compileSdk = 35
+    compileSdk = 36
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+    }
+     kotlinOptions {
+        jvmTarget = "17"
     }
 
     defaultConfig {

@@ -37,6 +37,13 @@ abstract class AppsonairFlutterApplinkPlatform extends PlatformInterface {
     throw UnimplementedError('platformVersion() has not been implemented.');
   }
 
+  ///Return the referral/attribution info: same as [getReferralInfo] with
+  ///`isFirstLaunch`, `firstInstallTime`, `isConsumed` and `attributionStatus`
+  ///included in the response.
+  Future<Map<String, dynamic>?> getAttributionInfo() {
+    throw UnimplementedError('platformVersion() has not been implemented.');
+  }
+
   ///Create the applink with provided AppLinkParams data
   Future<Map<String, dynamic>?> createAppLink(
       {required AppLinkParams appLinkParams}) {
@@ -50,6 +57,12 @@ abstract class AppsonairFlutterApplinkPlatform extends PlatformInterface {
 
   ///Initialize the applink service
   Stream<Map<String, dynamic>?> onReferralLinkDetected() {
+    throw UnimplementedError('platformVersion() has not been implemented.');
+  }
+
+  ///Fires when an attribution is detected, and again every time the app
+  ///returns to the foreground so the payload stays current.
+  Stream<Map<String, dynamic>?> onAttributionListener() {
     throw UnimplementedError('platformVersion() has not been implemented.');
   }
 }

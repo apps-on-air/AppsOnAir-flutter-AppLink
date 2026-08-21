@@ -1,64 +1,87 @@
+import AppsOnAir_AppLink
 import Flutter
 import UIKit
-import AppsOnAir_AppLink
 
 public class AppsonairFlutterApplinkPlugin: NSObject, FlutterPlugin {
-    
+
     // Singleton instance
     public static let shared = AppsonairFlutterApplinkPlugin()
-    
+
     private var channel: FlutterMethodChannel?
-    
+
     fileprivate static var pendingDeepLink: String?
     fileprivate static var pendingReferralDeepLink: String?
-    
+
     private override init() {
         super.init()
         // Initialize AppLinkService once
         initializeAppLinkService()
     }
-    
+
+    fileprivate static var pendingAttributionInfo: String?
+
     private func initializeAppLinkService() {
         AppLinkService.shared.initialize { latestUrl, result in
             let jsonResponse = ["uri": latestUrl?.absoluteString ?? "", "result": result]
             let jsonData = try? JSONSerialization.data(withJSONObject: jsonResponse, options: [])
             let jsonString = String(data: jsonData ?? Data(), encoding: .utf8)
-            
-            if let sink = AppLinkEventHandler.shared.eventSink {
-                sink(jsonString)
-            } else {
-                AppsonairFlutterApplinkPlugin.pendingDeepLink = jsonString
+
+            DispatchQueue.main.async {
+                if let sink = AppLinkEventHandler.shared.eventSink {
+                    sink(jsonString)
+                } else {
+                    AppsonairFlutterApplinkPlugin.pendingDeepLink = jsonString
+                }
             }
         } onReferralLinkDetected: { result in
             let jsonData = try? JSONSerialization.data(withJSONObject: result, options: [])
             let jsonString = String(data: jsonData ?? Data(), encoding: .utf8)
-            if let sink = ReferralEventHandler.shared.eventSink {
-                sink(jsonString)
-            } else {
-                AppsonairFlutterApplinkPlugin.pendingReferralDeepLink = jsonString
+            DispatchQueue.main.async {
+                if let sink = ReferralEventHandler.shared.eventSink {
+                    sink(jsonString)
+                } else {
+                    AppsonairFlutterApplinkPlugin.pendingReferralDeepLink = jsonString
+                }
+            }
+        } onAttributionListener: { result in
+            let jsonData = try? JSONSerialization.data(withJSONObject: result, options: [])
+            let jsonString = String(data: jsonData ?? Data(), encoding: .utf8)
+            DispatchQueue.main.async {
+                if let sink = AttributionEventHandler.shared.eventSink {
+                    sink(jsonString)
+                } else {
+                    AppsonairFlutterApplinkPlugin.pendingAttributionInfo = jsonString
+                }
             }
         }
     }
-    
+
     public static func register(with registrar: FlutterPluginRegistrar) {
         let instance = AppsonairFlutterApplinkPlugin.shared
-        instance.channel = FlutterMethodChannel(name: "appsOnAirAppLink", binaryMessenger: registrar.messenger())
+        instance.channel = FlutterMethodChannel(
+            name: "appsOnAirAppLink", binaryMessenger: registrar.messenger())
         registrar.addMethodCallDelegate(instance, channel: instance.channel!)
-        
+
         // Each event channel gets its own handler
-        let appLinkEventChannel = FlutterEventChannel(name: "appLinkEventChanel", binaryMessenger: registrar.messenger())
+        let appLinkEventChannel = FlutterEventChannel(
+            name: "appLinkEventChanel", binaryMessenger: registrar.messenger())
         appLinkEventChannel.setStreamHandler(AppLinkEventHandler.shared)
-        
-        let referralEventChannel = FlutterEventChannel(name: "appLinkReferralEventChanel", binaryMessenger: registrar.messenger())
+
+        let referralEventChannel = FlutterEventChannel(
+            name: "appLinkReferralEventChanel", binaryMessenger: registrar.messenger())
         referralEventChannel.setStreamHandler(ReferralEventHandler.shared)
+
+        let attributionEventChannel = FlutterEventChannel(
+            name: "appLinkAttributionEventChanel", binaryMessenger: registrar.messenger())
+        attributionEventChannel.setStreamHandler(AttributionEventHandler.shared)
     }
-    
+
     private func createAppLink(result: @escaping FlutterResult, call: FlutterMethodCall) {
         guard let args = call.arguments as? [String: Any] else {
             result("Invalid arguments")
             return
         }
-        
+
         let url = args["url"] as? String ?? ""
         let name = args["name"] as? String ?? ""
         let shortId = args["shortId"] as? String
@@ -66,12 +89,14 @@ public class AppsonairFlutterApplinkPlugin: NSObject, FlutterPlugin {
         let androidFallbackUrl = args["androidFallbackUrl"] as? String
         let iosFallbackUrl = args["iosFallbackUrl"] as? String
         let socialMeta = args["socialMeta"] as? [String: Any]
-        
+
         let isOpenInBrowserAndroid = args["isOpenInBrowserAndroid"] as? Bool
         let isOpenInAndroidApp = args["isOpenInAndroidApp"] as? Bool
         let isOpenInBrowserApple = args["isOpenInBrowserApple"] as? Bool
         let isOpenInIosApp = args["isOpenInIosApp"] as? Bool
-        
+        let appsFlyer = args["appsFlyer"] as? [String: Any]
+        let attributionTtl = args["attributionTtl"] as? Int
+
         AppLinkService.shared.createAppLink(
             url: url,
             name: name,
@@ -83,40 +108,64 @@ public class AppsonairFlutterApplinkPlugin: NSObject, FlutterPlugin {
             iosFallbackUrl: iosFallbackUrl,
             isOpenInAndroidApp: isOpenInAndroidApp,
             isOpenInBrowserAndroid: isOpenInBrowserAndroid,
-            androidFallbackUrl: androidFallbackUrl
+            androidFallbackUrl: androidFallbackUrl,
+            appsFlyer: appsFlyer,
+            attributionTtl: attributionTtl
         ) { latestLink in
+            let response: String
             if let data = try? JSONSerialization.data(withJSONObject: latestLink, options: []),
-               let jsonString = String(data: data, encoding: .utf8) {
-                result(jsonString)
+                let jsonString = String(data: data, encoding: .utf8)
+            {
+                response = jsonString
             } else {
-                result("Error converting response to JSON string")
+                response = "Error converting response to JSON string"
             }
+            DispatchQueue.main.async { result(response) }
         }
     }
-    
+
     private func getReferralDetails(result: @escaping FlutterResult, call: FlutterMethodCall) {
-        AppLinkService.shared.getReferralDetails {linkDetails in
+        AppLinkService.shared.getReferralDetails { linkDetails in
+            let response: String
             if let data = try? JSONSerialization.data(withJSONObject: linkDetails, options: []),
-               let jsonString = String(data: data, encoding: .utf8) {
-                result(jsonString)
+                let jsonString = String(data: data, encoding: .utf8)
+            {
+                response = jsonString
             } else {
-                result("Error converting response to JSON string")
+                response = "Error converting response to JSON string"
             }
+            DispatchQueue.main.async { result(response) }
         }
-           
     }
 
     private func getReferralInfo(result: @escaping FlutterResult, call: FlutterMethodCall) {
         AppLinkService.shared.getReferralInfo { linkDetails in
+            let response: String
             if let data = try? JSONSerialization.data(withJSONObject: linkDetails, options: []),
-               let jsonString = String(data: data, encoding: .utf8) {
-                result(jsonString)
+                let jsonString = String(data: data, encoding: .utf8)
+            {
+                response = jsonString
             } else {
-                result("Error converting response to JSON string")
+                response = "Error converting response to JSON string"
             }
+            DispatchQueue.main.async { result(response) }
         }
     }
-    
+
+    private func getAttributionInfo(result: @escaping FlutterResult, call: FlutterMethodCall) {
+        AppLinkService.shared.getAttributionInfo { attributionInfo in
+            let response: String
+            if let data = try? JSONSerialization.data(withJSONObject: attributionInfo, options: []),
+                let jsonString = String(data: data, encoding: .utf8)
+            {
+                response = jsonString
+            } else {
+                response = "Error converting response to JSON string"
+            }
+            DispatchQueue.main.async { result(response) }
+        }
+    }
+
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         switch call.method {
         case "create_app_link":
@@ -125,6 +174,8 @@ public class AppsonairFlutterApplinkPlugin: NSObject, FlutterPlugin {
             getReferralDetails(result: result, call: call)
         case "get_referral_info":
             getReferralInfo(result: result, call: call)
+        case "get_attribution_info":
+            getAttributionInfo(result: result, call: call)
         default:
             result(FlutterMethodNotImplemented)
         }
@@ -136,8 +187,10 @@ public class AppsonairFlutterApplinkPlugin: NSObject, FlutterPlugin {
 class AppLinkEventHandler: NSObject, FlutterStreamHandler {
     static let shared = AppLinkEventHandler()
     var eventSink: FlutterEventSink?
-    
-    func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
+
+    func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink)
+        -> FlutterError?
+    {
         self.eventSink = events
         if let pendingLink = AppsonairFlutterApplinkPlugin.pendingDeepLink {
             events(pendingLink)
@@ -145,7 +198,7 @@ class AppLinkEventHandler: NSObject, FlutterStreamHandler {
         }
         return nil
     }
-    
+
     func onCancel(withArguments arguments: Any?) -> FlutterError? {
         self.eventSink = nil
         return nil
@@ -155,8 +208,10 @@ class AppLinkEventHandler: NSObject, FlutterStreamHandler {
 class ReferralEventHandler: NSObject, FlutterStreamHandler {
     static let shared = ReferralEventHandler()
     var eventSink: FlutterEventSink?
-    
-    func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
+
+    func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink)
+        -> FlutterError?
+    {
         self.eventSink = events
         if let pendingLink = AppsonairFlutterApplinkPlugin.pendingReferralDeepLink {
             events(pendingLink)
@@ -164,7 +219,28 @@ class ReferralEventHandler: NSObject, FlutterStreamHandler {
         }
         return nil
     }
-    
+
+    func onCancel(withArguments arguments: Any?) -> FlutterError? {
+        self.eventSink = nil
+        return nil
+    }
+}
+
+class AttributionEventHandler: NSObject, FlutterStreamHandler {
+    static let shared = AttributionEventHandler()
+    var eventSink: FlutterEventSink?
+
+    func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink)
+        -> FlutterError?
+    {
+        self.eventSink = events
+        if let pendingAttributionInfo = AppsonairFlutterApplinkPlugin.pendingAttributionInfo {
+            events(pendingAttributionInfo)
+            AppsonairFlutterApplinkPlugin.pendingAttributionInfo = nil
+        }
+        return nil
+    }
+
     func onCancel(withArguments arguments: Any?) -> FlutterError? {
         self.eventSink = nil
         return nil
