@@ -148,6 +148,15 @@ class AppsonairFlutterApplinkPlugin: FlutterPlugin, MethodCallHandler, ActivityA
           result.success(attributionInfo.toString())
          }
        }
+      "get_app_link_info" -> {
+        val shortId: String = call.argument<String>("shortId") ?: ""
+        val urlPrefix: String = call.argument<String>("urlPrefix") ?: ""
+        val appLinkService = activity?.let { AppLinkService.getInstance(it.applicationContext) }
+        CoroutineScope(Dispatchers.Main).launch {
+          val linkInfo = appLinkService?.getAppLinkInfo(shortId, urlPrefix)
+          result.success(linkInfo.toString())
+        }
+      }
         else -> {
           result.notImplemented()
         }

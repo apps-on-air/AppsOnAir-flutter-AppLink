@@ -4,13 +4,13 @@ import PackageDescription
 let package = Package(
     name: "appsonair_flutter_applink",
     platforms: [
-        .iOS("13.0")
+        .iOS("15.0")
     ],
     products: [
         .library(name: "appsonair-flutter-applink", targets: ["appsonair_flutter_applink"])
     ],
     dependencies: [
-        .package(url: "https://github.com/apps-on-air/AppsOnAir-iOS-AppLink.git", exact: "2.0.2")
+        .package(url: "https://github.com/apps-on-air/AppsOnAir-iOS-AppLink.git", exact: "2.1.0")
     ],
     targets: [
         .target(

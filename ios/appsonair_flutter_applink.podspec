@@ -4,20 +4,21 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'appsonair_flutter_applink'
-  s.version          = '1.2.3'
-  s.summary          = 'A new Flutter plugin project.'
+  s.version          = '2.1.0'
+  s.summary          = 'AppsOnAir AppLink Flutter SDK — deep link tracking and engagement analytics for iOS and Android.'
   s.description      = <<-DESC
-A new Flutter plugin project.
+The AppsOnAir AppLink Flutter SDK enables deep link tracking and engagement analytics for both iOS and Android.
+It serves as a powerful alternative to Firebase Dynamic Links.
                        DESC
-  s.homepage         = 'http://example.com'
+  s.homepage         = 'https://appsonair.com'
   s.license          = { :file => '../LICENSE' }
-  s.author           = { 'Your Company' => 'email@example.com' }
+  s.author           = { 'devtools-logicwind' => 'devtools@logicwind.com' }
   s.source           = { :path => '.' }
   # Source files live in the SPM layout directory (shared between CocoaPods and SPM)
   s.source_files = 'appsonair_flutter_applink/Sources/appsonair_flutter_applink/**/*.{swift,h,m}'
   s.dependency 'Flutter'
-  s.platform = :ios, '13.0'
-  s.dependency 'AppsOnAir-AppLink', '2.0.2'
+  s.platform = :ios, '15.0'
+  s.dependency 'AppsOnAir-AppLink', '2.1.0'
 
   # Flutter.framework does not contain a i386 slice.
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }

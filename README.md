@@ -16,7 +16,7 @@
 
 #### iOS
 
-- iOS deployment target: 13.0
+- iOS deployment target: 15.0
 
 #### Provide your application id in your app info.plist file.
 
@@ -109,7 +109,7 @@ Then run:
 flutter pub get
 ```
 
-Flutter will automatically resolve `AppsOnAir-iOS-AppLink v1.4.0` via SPM. No additional Xcode configuration is required.
+Flutter will automatically resolve `AppsOnAir-iOS-AppLink` via SPM. No additional Xcode configuration is required.
 
 > **Note:** You can also enable SPM globally for all your Flutter projects (instead of per-project) by running:
 > ```sh
@@ -134,7 +134,7 @@ Flutter will automatically resolve `AppsOnAir-iOS-AppLink v1.4.0` via SPM. No ad
 
 #### Add below code to setting.gradle.
 
-```sh
+```groovy
 pluginManagement {
    repositories {
        google()
@@ -147,7 +147,7 @@ pluginManagement {
 
 #### Add below code to your root level build.gradle
 
-```sh
+```groovy
 allprojects {
    repositories {
        google()
@@ -209,7 +209,7 @@ await _appsonairFlutterApplinkPlugin.createAppLink(
         appLinkParams: AppLinkParams(
           url: 'https://appsonair.com',
           name: 'AppsOnAir',
-          urlPrefix: 'YOUR_DOMAIN_NAME', //shouldn't contain http or https
+          urlPrefix: 'YOUR_DOMAIN_NAME', // e.g. example.appsonair.link — no http/https
           shortId: 'LINK_ID', // If not set, it will be auto-generated
           socialMeta: SocialMeta(
             title: 'link title',
@@ -271,8 +271,18 @@ var data = await _appsonairFlutterApplinkPlugin.getAttributionInfo();
 
 `getAttributionInfo()` returns the same data as the deprecated `getReferralInfo()`, plus `isFirstLaunch`, `firstInstallTime`, `isConsumed` and `attributionStatus`.
 
-> **Deprecated:**
-#### To retrieving the referral link
+#### To fetch details of an existing AppLink
+```dart
+var data = await _appsonairFlutterApplinkPlugin.getAppLinkInfo(
+  shortId: 'LINK_ID',
+  urlPrefix: 'YOUR_DOMAIN_NAME', // e.g. example.appsonair.link — no http/https
+);
+```
+
+#### Retrieve the referral link (Deprecated)
+
+> **Deprecated:** Use [`getAttributionInfo()`](#to-retrieve-the-attribution-info) instead.
+
 ```dart
 var data = await _appsonairFlutterApplinkPlugin.getReferralInfo();
 ```

@@ -1,4 +1,5 @@
 import 'dart:developer';
+
 import 'package:appsonair_flutter_applink/models/app_link_params.dart';
 import 'package:flutter/material.dart';
 
@@ -20,26 +21,44 @@ class _MyAppState extends State<MyApp> {
   String _linkDetails = '';
   String _attributionDetails = '';
   String _referralDetails = '';
+  String _appLinkInfo = '';
   final _appsonairFlutterApplinkPlugin = AppsonairFlutterApplink();
 
+  // URL Prefix options
+  static const List<String> _urlPrefixOptions = [
+    'tmdb.appsonair.link',
+    'tmdb.tryandtaste.shop',
+  ];
+  String _selectedUrlPrefix = 'tmdb.appsonair.link';
+
   // Form Controllers
-  final TextEditingController _urlController =
-      TextEditingController(text: 'https://appsonair.com');
-  final TextEditingController _nameController =
-      TextEditingController(text: 'AppsOnAir');
-  final TextEditingController _urlPrefixController =
-      TextEditingController(text: 'YOUR_DOMAIN_NAME');
+  final TextEditingController _urlController = TextEditingController(
+    text: 'https://tmdb.tryandtaste.shop',
+  );
+  final TextEditingController _nameController = TextEditingController(
+    text: 'TMDB QA',
+  );
+  final TextEditingController _urlPrefixController = TextEditingController(
+    text: 'tmdb.appsonair.link',
+  );
   final TextEditingController _shortIdController = TextEditingController();
-  final TextEditingController _titleController =
-      TextEditingController(text: 'link title');
-  final TextEditingController _descriptionController =
-      TextEditingController(text: 'link description');
-  final TextEditingController _imageUrlController =
-      TextEditingController(text: 'https://image.png');
+  final TextEditingController _titleController = TextEditingController(
+    text: 'TMDB Movie App',
+  );
+  final TextEditingController _descriptionController = TextEditingController(
+    text: 'Explore movies and TV shows powered by TMDB',
+  );
+  final TextEditingController _imageUrlController = TextEditingController(
+    text: 'https://tmdb.tryandtaste.shop/og-image.png',
+  );
   final TextEditingController _androidFallbackController =
-      TextEditingController(text: 'https://play.google.com');
-  final TextEditingController _iosFallbackController =
-      TextEditingController(text: 'https://appstore.com');
+      TextEditingController(
+        text:
+            'https://play.google.com/store/apps/details?id=com.logicwind.tmdb',
+      );
+  final TextEditingController _iosFallbackController = TextEditingController(
+    text: 'https://apps.apple.com/app/id/com.logicwind.tmdb',
+  );
 
   // AppsFlyer Attribution Controllers
   final TextEditingController _appsFlyerChannelController =
@@ -54,8 +73,9 @@ class _MyAppState extends State<MyApp> {
       TextEditingController();
   final TextEditingController _appsFlyerMetaDescriptionController =
       TextEditingController();
-  final TextEditingController _attributionTtlController =
-      TextEditingController(text: '3600');
+  final TextEditingController _attributionTtlController = TextEditingController(
+    text: '3600',
+  );
 
   // Toggle States
   bool _isOpenInAndroidApp = true;
@@ -182,6 +202,31 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
+  Future<void> getAppLinkInfo() async {
+    final shortId = _shortIdController.text.trim();
+    final urlPrefix = _urlPrefixController.text.trim();
+    if (shortId.isEmpty || urlPrefix.isEmpty) {
+      setState(() {
+        _appLinkInfo = 'Please enter Short ID and URL Prefix.';
+      });
+      return;
+    }
+    try {
+      var data = await _appsonairFlutterApplinkPlugin.getAppLinkInfo(
+        shortId: shortId,
+        urlPrefix: urlPrefix,
+      );
+      setState(() {
+        _appLinkInfo = data.toString();
+      });
+    } on PlatformException catch (e) {
+      log(e.toString());
+      setState(() {
+        _appLinkInfo = 'Failed to get AppLink info: ${e.message}';
+      });
+    }
+  }
+
   Widget _buildTextField({
     required TextEditingController controller,
     required String label,
@@ -197,8 +242,10 @@ class _MyAppState extends State<MyApp> {
           labelText: label,
           hintText: hint,
           border: const OutlineInputBorder(),
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 10,
+          ),
         ),
       ),
     );
@@ -259,10 +306,38 @@ class _MyAppState extends State<MyApp> {
                 label: 'Name',
                 hint: 'App Name',
               ),
-              _buildTextField(
-                controller: _urlPrefixController,
-                label: 'URL Prefix',
-                hint: 'YOUR_DOMAIN_NAME (no http/https)',
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+                child: DropdownButtonFormField<String>(
+                  initialValue: _selectedUrlPrefix,
+                  decoration: const InputDecoration(
+                    labelText: 'URL Prefix',
+                    border: OutlineInputBorder(),
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 10,
+                    ),
+                  ),
+                  items: _urlPrefixOptions
+                      .map(
+                        (prefix) => DropdownMenuItem(
+                          value: prefix,
+                          child: Text(prefix),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (value) {
+                    if (value != null) {
+                      setState(() {
+                        _selectedUrlPrefix = value;
+                        _urlPrefixController.text = value;
+                      });
+                    }
+                  },
+                ),
               ),
               _buildTextField(
                 controller: _shortIdController,
@@ -406,7 +481,9 @@ class _MyAppState extends State<MyApp> {
                         backgroundColor: Colors.green,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 12),
+                          horizontal: 20,
+                          vertical: 12,
+                        ),
                       ),
                     ),
                     ElevatedButton.icon(
@@ -417,7 +494,22 @@ class _MyAppState extends State<MyApp> {
                         backgroundColor: Colors.deepPurple,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 12),
+                          horizontal: 20,
+                          vertical: 12,
+                        ),
+                      ),
+                    ),
+                    ElevatedButton.icon(
+                      onPressed: getAppLinkInfo,
+                      icon: const Icon(Icons.info_outline),
+                      label: const Text('Get AppLink Info'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.teal,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 12,
+                        ),
                       ),
                     ),
                   ],
@@ -426,7 +518,8 @@ class _MyAppState extends State<MyApp> {
               const SizedBox(height: 24),
               if (_linkDetails.isNotEmpty ||
                   _attributionDetails.isNotEmpty ||
-                  _referralDetails.isNotEmpty) ...[
+                  _referralDetails.isNotEmpty ||
+                  _appLinkInfo.isNotEmpty) ...[
                 const Divider(),
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -451,7 +544,8 @@ class _MyAppState extends State<MyApp> {
                   ),
                 ),
                 const SelectableText(
-                    "Referral Details (onReferralLinkDetected)"),
+                  "Referral Details (onReferralLinkDetected)",
+                ),
                 Container(
                   margin: const EdgeInsets.all(12),
                   padding: const EdgeInsets.all(12),
@@ -467,7 +561,8 @@ class _MyAppState extends State<MyApp> {
                   ),
                 ),
                 const SelectableText(
-                    "Attribution Info (onAttributionListener)"),
+                  "Attribution Info (onAttributionListener)",
+                ),
                 Container(
                   margin: const EdgeInsets.all(12),
                   padding: const EdgeInsets.all(12),
@@ -482,6 +577,23 @@ class _MyAppState extends State<MyApp> {
                     style: const TextStyle(fontSize: 12),
                   ),
                 ),
+                if (_appLinkInfo.isNotEmpty) ...[
+                  const SelectableText("AppLink Info (getAppLinkInfo)"),
+                  Container(
+                    margin: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(8),
+                      color: Colors.grey[100],
+                    ),
+                    child: SelectableText(
+                      _appLinkInfo,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                  ),
+                ],
               ],
               const SizedBox(height: 20),
             ],

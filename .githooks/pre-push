@@ -1,0 +1,36 @@
+#!/bin/sh
+# Pre-push hook — mirrors the publish.yml CI checks so failures are caught
+# locally before reaching GitHub.
+
+set -e
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+cd "$REPO_ROOT"
+
+echo "→ dart format check..."
+dart format --output=none --set-exit-if-changed .
+echo "  ✓ formatting OK"
+
+echo "→ flutter analyze..."
+flutter analyze --no-pub
+echo "  ✓ analyze OK"
+
+echo "→ flutter test..."
+flutter test
+echo "  ✓ tests OK"
+
+# Extract version from pubspec.yaml (works with or without quotes)
+VERSION=$(grep '^version:' pubspec.yaml | sed 's/version:[[:space:]]*//' | tr -d '"' | tr -d "'")
+echo "→ CHANGELOG check for version $VERSION..."
+if ! grep -qF "$VERSION" CHANGELOG.md; then
+  echo "  ✗ CHANGELOG.md does not mention current version ($VERSION)."
+  echo "    Add a section for $VERSION before pushing."
+  exit 1
+fi
+echo "  ✓ CHANGELOG OK"
+
+echo "→ dart pub publish --dry-run..."
+dart pub publish --dry-run
+echo "  ✓ dry-run OK"
+
+echo "Pre-push checks passed."
