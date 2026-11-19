@@ -8,6 +8,8 @@ void main() {
 
   test('$MethodChannelAppsonairFlutterApplink is the default instance', () {
     expect(
-        initialPlatform, isInstanceOf<MethodChannelAppsonairFlutterApplink>());
+      initialPlatform,
+      isInstanceOf<MethodChannelAppsonairFlutterApplink>(),
+    );
   });
 }
