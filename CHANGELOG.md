@@ -1,3 +1,10 @@
+## 2.1.0
+
+* Added `getAppLinkInfo()` method — fetch details of an existing AppLink by its `shortId` and `urlPrefix`.
+* Updated minimum Dart SDK requirement to 3.13.7 (security patch)
+* Updated minimum Flutter version to 3.47.8 (security patch — HTTPS certificate validation fix)
+* Documentation updated.
+
 ## 2.0.1
 
 * Dependencies upgrade and improvements.

@@ -12,17 +12,22 @@ class MethodChannelAppsonairFlutterApplink
 
   final methodChannel = const MethodChannel('appsOnAirAppLink');
   final eventChannel = const EventChannel('appLinkEventChanel');
-  final appLinkReferralEventChanel =
-      const EventChannel('appLinkReferralEventChanel');
-  final appLinkAttributionEventChanel =
-      const EventChannel('appLinkAttributionEventChanel');
+  final appLinkReferralEventChanel = const EventChannel(
+    'appLinkReferralEventChanel',
+  );
+  final appLinkAttributionEventChanel = const EventChannel(
+    'appLinkAttributionEventChanel',
+  );
 
   ///Pass the AppLinkParams data to native api and provide the response received from native api to flutter
   @override
-  Future<Map<String, dynamic>?> createAppLink(
-      {required AppLinkParams appLinkParams}) async {
+  Future<Map<String, dynamic>?> createAppLink({
+    required AppLinkParams appLinkParams,
+  }) async {
     final response = await methodChannel.invokeMethod(
-        'create_app_link', appLinkParams.toJson());
+      'create_app_link',
+      appLinkParams.toJson(),
+    );
     return jsonDecode(response);
   }
 
@@ -48,28 +53,41 @@ class MethodChannelAppsonairFlutterApplink
     return jsonDecode(response);
   }
 
+  ///Fetches the details of an existing AppLink by its short ID and URL prefix
+  @override
+  Future<Map<String, dynamic>?> getAppLinkInfo({
+    required String shortId,
+    required String urlPrefix,
+  }) async {
+    final response = await methodChannel.invokeMethod('get_app_link_info', {
+      'shortId': shortId,
+      'urlPrefix': urlPrefix,
+    });
+    return jsonDecode(response);
+  }
+
   ///Initialize the applink service in your application for link tracking and deeplinking
   @override
   Stream<Map<String, dynamic>?> initializeAppLink() {
-    return eventChannel
-        .receiveBroadcastStream()
-        .map((event) => jsonDecode(event));
+    return eventChannel.receiveBroadcastStream().map(
+      (event) => jsonDecode(event),
+    );
   }
 
   ///Provide the referral detail once app is launched after install for first time.
   @override
   Stream<Map<String, dynamic>?> onReferralLinkDetected() {
-    return appLinkReferralEventChanel
-        .receiveBroadcastStream()
-        .map((event) => jsonDecode(event));
+    return appLinkReferralEventChanel.receiveBroadcastStream().map(
+      (event) => jsonDecode(event),
+    );
   }
 
   ///Fires when an attribution is detected, and again every time the app
   ///returns to the foreground so the payload stays current.
   @override
   Stream<Map<String, dynamic>?> onAttributionListener() {
-    return appLinkAttributionEventChanel
-        .receiveBroadcastStream()
-        .map((event) => jsonDecode(event));
+    return appLinkAttributionEventChanel.receiveBroadcastStream().map(
+      (event) => jsonDecode(event),
+    );
   }
 }

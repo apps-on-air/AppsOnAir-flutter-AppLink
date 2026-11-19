@@ -128,27 +128,23 @@ class SocialMeta {
   final String? imageUrl;
 
   /// Creates a [SocialMeta] object with optional [title], [description], and [imageUrl].
-  SocialMeta({
-    this.title,
-    this.description,
-    this.imageUrl,
-  });
+  SocialMeta({this.title, this.description, this.imageUrl});
 
   /// Creates a [SocialMeta] object from a JSON map.
   ///
   /// The keys `title`, `description`, and `imageUrl` are read from the [json] map.
   factory SocialMeta.fromJson(Map<String, dynamic> json) => SocialMeta(
-        title: json['title'],
-        description: json['description'],
-        imageUrl: json['imageUrl'],
-      );
+    title: json['title'],
+    description: json['description'],
+    imageUrl: json['imageUrl'],
+  );
 
   /// Converts this [SocialMeta] object into a JSON map.
   ///
   /// Only non-null fields are included in the returned map.
   Map<String, dynamic> toJson() => {
-        if (title != null) 'title': title,
-        if (description != null) 'description': description,
-        if (imageUrl != null) 'imageUrl': imageUrl,
-      };
+    if (title != null) 'title': title,
+    if (description != null) 'description': description,
+    if (imageUrl != null) 'imageUrl': imageUrl,
+  };
 }

@@ -166,6 +166,27 @@ public class AppsonairFlutterApplinkPlugin: NSObject, FlutterPlugin {
         }
     }
 
+    private func getAppLinkInfo(result: @escaping FlutterResult, call: FlutterMethodCall) {
+        guard let args = call.arguments as? [String: Any],
+              let shortId = args["shortId"] as? String,
+              let urlPrefix = args["urlPrefix"] as? String
+        else {
+            result(FlutterError(code: "INVALID_ARGS", message: "shortId and urlPrefix are required", details: nil))
+            return
+        }
+        AppLinkService.shared.getAppLinkInfo(shortId: shortId, urlPrefix: urlPrefix) { linkInfo in
+            let response: String
+            if let data = try? JSONSerialization.data(withJSONObject: linkInfo, options: []),
+                let jsonString = String(data: data, encoding: .utf8)
+            {
+                response = jsonString
+            } else {
+                response = "Error converting response to JSON string"
+            }
+            DispatchQueue.main.async { result(response) }
+        }
+    }
+
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         switch call.method {
         case "create_app_link":
@@ -176,6 +197,8 @@ public class AppsonairFlutterApplinkPlugin: NSObject, FlutterPlugin {
             getReferralInfo(result: result, call: call)
         case "get_attribution_info":
             getAttributionInfo(result: result, call: call)
+        case "get_app_link_info":
+            getAppLinkInfo(result: result, call: call)
         default:
             result(FlutterMethodNotImplemented)
         }

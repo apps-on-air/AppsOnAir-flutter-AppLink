@@ -1,0 +1,78 @@
+#!/bin/sh
+# Pre-commit hook — verifies required documentation is in sync before every commit.
+#
+# Checks:
+#   1. pubspec.yaml has version, description, and homepage set
+#   2. CHANGELOG.md has an entry for the current pubspec version
+#   3. CHANGELOG entry has at least one bullet point (not an empty header)
+#   4. README.md exists and is non-empty
+#
+# Activate with: sh scripts/setup-hooks.sh
+
+set -e
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+cd "$REPO_ROOT"
+
+PASS=true
+
+# ── 1. pubspec.yaml fields ────────────────────────────────────────────────────
+
+VERSION=$(grep '^version:' pubspec.yaml | sed 's/version:[[:space:]]*//' | tr -d '"' | tr -d "'")
+DESCRIPTION=$(grep '^description:' pubspec.yaml | sed 's/description:[[:space:]]*//' | tr -d '"' | tr -d "'")
+HOMEPAGE=$(grep '^homepage:' pubspec.yaml | sed 's/homepage:[[:space:]]*//' | tr -d '"' | tr -d "'")
+
+if [ -z "$VERSION" ]; then
+  echo "✗ pubspec.yaml: 'version' is missing or empty."
+  PASS=false
+fi
+
+if [ -z "$DESCRIPTION" ]; then
+  echo "✗ pubspec.yaml: 'description' is missing or empty."
+  PASS=false
+fi
+
+if [ -z "$HOMEPAGE" ] || echo "$HOMEPAGE" | grep -q "^#"; then
+  echo "✗ pubspec.yaml: 'homepage' is missing or commented out."
+  PASS=false
+fi
+
+# ── 2. CHANGELOG.md has an entry for current version ─────────────────────────
+
+if [ ! -f CHANGELOG.md ]; then
+  echo "✗ CHANGELOG.md is missing."
+  PASS=false
+elif ! grep -qF "## $VERSION" CHANGELOG.md; then
+  echo "✗ CHANGELOG.md has no entry for version $VERSION."
+  echo "  Add '## $VERSION' with release notes before committing."
+  PASS=false
+else
+  # ── 3. CHANGELOG entry is not empty (has at least one bullet) ──────────────
+  # Extract lines after the version header until the next ## or EOF
+  ENTRY=$(awk "/^## $VERSION/{found=1; next} found && /^## /{exit} found{print}" CHANGELOG.md)
+  BULLETS=$(echo "$ENTRY" | grep -c '^\*' || true)
+  if [ "$BULLETS" -eq 0 ]; then
+    echo "✗ CHANGELOG.md: section for $VERSION has no bullet points. Add release notes."
+    PASS=false
+  fi
+fi
+
+# ── 4. README.md exists and is non-empty ─────────────────────────────────────
+
+if [ ! -f README.md ]; then
+  echo "✗ README.md is missing."
+  PASS=false
+elif [ ! -s README.md ]; then
+  echo "✗ README.md is empty."
+  PASS=false
+fi
+
+# ── Result ────────────────────────────────────────────────────────────────────
+
+if [ "$PASS" = false ]; then
+  echo ""
+  echo "Pre-commit checks failed. Fix the issues above and try again."
+  exit 1
+fi
+
+echo "✓ Pre-commit doc checks passed (version: $VERSION)."
